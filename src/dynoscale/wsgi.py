@@ -11,7 +11,7 @@ class DynoscaleWsgiApp:
 
     def __init__(self, app):
         self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscaleWsgiApp.__name__}")
-        self.logger.debug(f"__init__")
+        self.logger.debug("__init__")
         self.__app = app
 
         self.config = Config()
@@ -28,7 +28,7 @@ class DynoscaleWsgiApp:
             self.logger.debug("__call__")
             if self.config.is_valid:
                 self.log_queue_time(environ)
-        except Exception as e:
+        except Exception:
             self.logger.error("Unknown error, while processing Wsgi __call__")
         finally:
             return self.__app(environ, start_response)
@@ -48,6 +48,6 @@ class DynoscaleWsgiApp:
                 self.logger.debug(f"log_queue_time - Logging queue time {req_queue_time}")
                 self.ds_agent.log_queue_time(req_timestamp, req_queue_time)
             else:
-                self.logger.info(f"Can not calculate queue time.")
+                self.logger.info("Can not calculate queue time.")
         except Exception as e:
             self.logger.error(f"Unknown error while attempting to log a queue time: {e}")

@@ -1,10 +1,15 @@
 import math
 import random
 import re
+import sys
 import time
+from importlib.machinery import ModuleSpec
+from importlib.util import find_spec, module_from_spec
+from types import ModuleType
 from typing import Optional, Union, List, Tuple
 
 # @formatter:off
+# noinspection SpellCheckingInspection
 ul = "\u00a1-\uffff"  # Unicode letters range (must not be a raw string).
 
 # IP patterns
@@ -48,6 +53,17 @@ def epoch_ms() -> int:
     return math.floor(time.time_ns() / 1_000_000)
 
 
+def ensure_module(name: str) -> Optional[ModuleType]:
+    if name in sys.modules:
+        return sys.modules.get(name, None)
+    elif find_spec(name) is not None:
+        spec: ModuleSpec = find_spec(name)
+        module: ModuleType = module_from_spec(spec)
+        sys.modules[name] = module
+        spec.loader.exec_module(module)
+        return module
+
+
 def get_int_from_headers(
         headers: Union[dict, List[Tuple[str, str]]],
         key: str, default: Optional[int] = None
@@ -58,11 +74,8 @@ def get_int_from_headers(
             headers = headers.items()
         candidates = [i for i in headers if len(i) > 1
                       and isinstance(i[0], str)
-                      and (
-                              isinstance(i[1], int)
-                              or isinstance(i[1], float)
-                              or isinstance(i[1], str)
-                      )]
+                      and (isinstance(i[1], int) or isinstance(i[1], float) or isinstance(i[1], str))
+                      ]
         values = [i[1] for i in candidates if i[0].lower() == key.lower()]
         value = values[0] if len(values) > 0 else default
         result = int(value)

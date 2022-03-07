@@ -5,7 +5,7 @@ import time
 from dataclasses import dataclass
 from io import StringIO
 from json import JSONDecodeError
-from typing import Optional, Union, Iterable
+from typing import Optional, Union, Iterable, Callable
 
 import requests
 from requests import Session, PreparedRequest, Response, Request
@@ -96,12 +96,6 @@ def upload_payload(url: str, payload: bytes, dyno: str, session: Optional[Sessio
 
 class DynoscalePublisher:
 
-    def __init__(self, repository_path: Optional[Union[str, bytes, os.PathLike]] = None, api_url: Optional[str] = None):
-        self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscalePublisher.__name__}")
-        self.config = Config()
-        self.repository = DynoscaleRepository(repository_path)
-        self.session = Session()
-
     @property
     def last_publish_attempt(self) -> float:
         return self.repository.get(KEY_LAST_PUBLISH_ATTEMPT, 0)  # 0 here means never even though it really is 1970
@@ -130,9 +124,22 @@ class DynoscalePublisher:
     def publish_frequency(self, seconds: float):
         self.repository[KEY_PUBLISH_FREQUENCY] = seconds
 
+    def __init__(self, repository_path: Optional[Union[str, bytes, os.PathLike]] = None):
+        self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscalePublisher.__name__}")
+        self.config: Config = Config()
+        self.repository: DynoscaleRepository = DynoscaleRepository(repository_path)
+        self.session: Session = Session()
+        self.pre_publish_hook: Optional[Callable] = None
+
     def tick(self):
         # check if we should publish at all
         if self.should_publish():
+            # if we have a valid pre_publish_hook call it safely
+            if callable(self.pre_publish_hook):
+                try:
+                    self.pre_publish_hook()
+                except Exception as e:
+                    logger.error(f"DynoscalePublisher encountered error while executing pre_publish_hook: {e}")
             # and attempt to publish
             self.publish()
 
@@ -144,6 +151,7 @@ class DynoscalePublisher:
         self.repository.delete_records_older_than(MAX_RECORD_AGE)
         # then check if the config is even valid and return if it isn't
         if self.config.is_not_valid:
+            self.logger.warning("Can not publish with invalid config.")
             return
         # if config is valid, store the time we grabbed records from db
         start_time = time.time()

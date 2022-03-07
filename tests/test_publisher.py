@@ -55,7 +55,7 @@ def test_publisher_initializes(env_valid):
     assert DynoscalePublisher()
 
 
-def test_publisher_init_with_path(env_valid, repo_path):
+def test_publisher_init_with_repo_path(env_valid, repo_path):
     from dynoscale.publisher import DynoscalePublisher
     publisher = DynoscalePublisher(repository_path=repo_path)
     assert publisher
@@ -90,33 +90,34 @@ def test_publisher_does_not_publish_with_just_old_data(ds_publisher, mocked_resp
     assert len(mocked_responses.calls) == 0
 
 
-def test_publisher_does_not_publish_if_config_invalid(env_invalid, repo_path, mocked_responses, mock_url):
+def test_publisher_does_not_publish_if_config_invalid(env_invalid, repo_path, mocked_responses):
     from dynoscale.publisher import DynoscalePublisher
 
-    publisher = DynoscalePublisher(repository_path=repo_path, api_url=mock_url)
+    publisher = DynoscalePublisher(repository_path=repo_path)
     publisher.repository.add_record(Record(epoch_s(), 0, 'web', ''))
     publisher.tick()
     assert not publisher.last_publish_attempt
 
 
-def test_publisher_can_handle_non_ok_response(env_valid, repo_path, mocked_responses, mock_url):
+def test_publisher_can_handle_non_ok_response(env_valid, repo_path, mocked_responses):
     from dynoscale.publisher import DynoscalePublisher
-    mocked_responses.add(responses.POST, mock_url, status=500, json={})
+    publisher = DynoscalePublisher(repository_path=repo_path)
+    mocked_responses.add(responses.POST, publisher.config.url, status=500, json={})
 
-    publisher = DynoscalePublisher(repository_path=repo_path, api_url=mock_url)
     publisher.repository.add_record(Record(epoch_s(), 0, 'web', ''))
     publisher.tick()
     assert not publisher.last_publish_success
 
 
-def test_publisher_publishes_after_first_response(env_valid, repo_path, mocked_responses, mock_url):
+def test_publisher_publishes_after_first_response(env_valid, repo_path, mocked_responses):
     from dynoscale.publisher import DynoscalePublisher
-    mocked_responses.add(responses.POST, mock_url, status=200)
+    publisher = DynoscalePublisher(repository_path=repo_path)
+    mocked_responses.add(responses.POST, publisher.config.url, status=200)
 
-    publisher = DynoscalePublisher(repository_path=repo_path, api_url=mock_url)
     publisher.repository.add_record(Record(epoch_s(), 0, 'web', ''))
     publisher.tick()
     assert publisher.last_publish_attempt
+    assert publisher.last_publish_success
 
 
 def test_publisher_publishes_data_with_forced_publish_frequency(ds_publisher, mocked_api_200_no_config):
@@ -167,6 +168,32 @@ def test_publisher_doesnt_publish_old_logs(
     ds_publisher.tick()
     assert not ds_publisher.last_publish_success
     assert not ds_repository.get_all_records()
+
+
+def test_publisher_doesnt_crash_when_prepublish_hook_raises_exception(
+        env_valid,
+        ds_repository,
+        ds_publisher,
+        mocked_responses,
+        caplog
+):
+    ds_publisher.repository.add_record(Record(epoch_s(), 0, 'web', ''))
+    ds_publisher.publish_frequency = 0
+
+    def do_raise():
+        raise AttributeError("ERROR")
+
+    ds_publisher.pre_publish_hook = do_raise
+
+    mocked_responses.add(responses.POST, ds_publisher.config.url, status=200, json={})
+
+    with caplog.at_level("WARNING"):
+        caplog.clear()
+        ds_publisher.tick()
+        assert ds_publisher.last_publish_attempt
+        assert caplog.record_tuples == [
+            ('dynoscale.publisher', 40, 'DynoscalePublisher encountered error while executing pre_publish_hook: ERROR')
+        ]
 
 
 @pytest.mark.asyncio

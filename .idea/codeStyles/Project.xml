@@ -1,5 +1,24 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <option name="FORMATTER_TAGS_ENABLED" value="true" />
+    <Python>
+      <option name="ALIGN_MULTILINE_IMPORTS" value="false" />
+      <option name="DICT_WRAPPING" value="5" />
+      <option name="DICT_NEW_LINE_AFTER_LEFT_BRACE" value="true" />
+      <option name="DICT_NEW_LINE_BEFORE_RIGHT_BRACE" value="true" />
+      <option name="FROM_IMPORT_WRAPPING" value="5" />
+      <option name="FROM_IMPORT_NEW_LINE_AFTER_LEFT_PARENTHESIS" value="true" />
+      <option name="FROM_IMPORT_NEW_LINE_BEFORE_RIGHT_PARENTHESIS" value="true" />
+      <option name="FROM_IMPORT_PARENTHESES_FORCE_IF_MULTILINE" value="true" />
+      <option name="FROM_IMPORT_TRAILING_COMMA_IF_MULTILINE" value="true" />
+    </Python>
+    <codeStyleSettings language="Python">
+      <option name="CALL_PARAMETERS_WRAP" value="5" />
+      <option name="CALL_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
+      <option name="CALL_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
+      <option name="METHOD_PARAMETERS_WRAP" value="5" />
+      <option name="METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
+      <option name="METHOD_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
+    </codeStyleSettings>
   </code_scheme>
 </component>

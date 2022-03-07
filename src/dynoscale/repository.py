@@ -59,7 +59,7 @@ class DynoscaleRepository(Permadict):
             )
 
     def get_all_records(self) -> Tuple[RecordOut]:
-        self.logger.debug(f"get_all_records")
+        self.logger.debug("get_all_records")
         with self.cursor() as cur:
             cur.execute("SELECT rowid, timestamp, metric, source, metadata FROM logs ORDER BY timestamp")
             rows = cur.fetchall()

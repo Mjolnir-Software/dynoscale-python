@@ -69,3 +69,7 @@ Feel free to check out `./examples`, yes, we do have examples in the repository 
 
 Install development requirements by running `noglob pip install -e .[test]` if you use ZSH, or
 `pip install -e .[test]` if you're stuck with Bash.
+
+You can run _pytest_ from terminal: `pytest`
+
+You can run _flake8_ from terminal: `flake8 ./src`  

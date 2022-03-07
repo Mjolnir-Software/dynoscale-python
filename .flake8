@@ -1,0 +1,6 @@
+[flake8]
+# it's not a bug that we aren't using all of hacking, ignore:
+# E501: Handled by IDE
+# F812: list comprehension redefines ...
+# W504: Line break after binary operator is actually an anti-pattern
+ignore = E501,W503

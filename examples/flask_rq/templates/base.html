@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>flask_rq - {% block title %}{% endblock %}</title>
+    <style>
+        html {
+            font-family: sans-serif;
+        }
+
+        nav a {
+            background-color: #311111;
+            color: white;
+            padding: 0.75em;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        nav a:hover {
+            background-color: #ba1919;
+        }
+
+        nav a:active {
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <a class="button" href="{{ url_for('index') }}">home</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=urgent">new urgent job</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=priority">new priority job</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=default">new default job</a>
+</nav>
+<div class="content">
+    {% block content %} {% endblock %}
+</div>
+</body>
+</html>
