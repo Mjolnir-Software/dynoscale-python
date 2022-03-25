@@ -120,6 +120,7 @@ if __name__ == "__main__":
 
     print(f"Starting Flask server, sending RQ jobs to redis @ {redis_url}")
     app.wsgi_app = DynoscaleWsgiApp(app.wsgi_app)
-    app.run(host='0.0.0.0', port=3000, debug=True)
+    port = os.getenv('PORT', 3000)
+    app.run(host='0.0.0.0', port=port, debug=True)
 else:
     init_redis_conn_and_queues()
