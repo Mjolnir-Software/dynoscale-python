@@ -76,10 +76,9 @@ class Permadict(MutableMapping):
             cur.execute("INSERT OR REPLACE INTO dict VALUES (?,?)", (key, binary))
 
     def __delitem__(self, key):
-        if key not in self:
-            raise KeyError
-        with self.cursor() as cur:
-            cur.execute("DELETE FROM dict WHERE name = (?)", (key,))
+        if key in self:
+            with self.cursor() as cur:
+                cur.execute("DELETE FROM dict WHERE name = (?)", (key,))
 
     def __contains__(self, key):
         try:

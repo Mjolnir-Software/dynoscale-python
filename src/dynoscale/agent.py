@@ -15,9 +15,17 @@ logger = logging.getLogger(__name__)
 request_log_queue = queue.Queue()
 
 
-def queue_time_logger(repository_path: Optional[Union[str, bytes, os.PathLike]] = None):
+def queue_time_logger(
+        repository_path: Optional[Union[str, bytes, os.PathLike]] = None,
+        enable_rq_logger: bool = False
+):
     logger.debug("queue_time_logger")
     publisher = DynoscalePublisher(repository_path)
+    if enable_rq_logger:
+        from dynoscale.workers.rq_logger import DynoscaleRqLogger
+        rq_logger = DynoscaleRqLogger(repository_path)
+        publisher.pre_publish_hook = rq_logger.log_queue_times
+
     while True:
         record: Record = request_log_queue.get()
         logger.debug(f"queue_time_logger - got record from queue: {record}")
@@ -32,13 +40,16 @@ class DynoscaleAgent:
             repository_path: Optional[Union[str, bytes, os.PathLike]] = None
     ):
         self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscaleAgent.__name__}")
-        self.logger.debug(f"__init__")
+        self.logger.debug("__init__")
         self.config = Config()
         if self.config.is_valid:
             self.t_logger = threading.Thread(
                 target=queue_time_logger,
                 daemon=True,
-                args=(repository_path,),
+                kwargs={
+                    'repository_path': repository_path,
+                    'enable_rq_logger': self.config.is_rq_available,
+                },
                 name='Dynoscale'
             )
             self.t_logger.start()

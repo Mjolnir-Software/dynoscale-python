@@ -7,6 +7,14 @@ import pytest
 import requests
 import responses
 
+from dynoscale.constants import (
+    ENV_REDISGREEN_URL,
+    ENV_OPENREDIS_URL,
+    ENV_REDISCLOUD_URL,
+    ENV_REDISTOGO_URL,
+    ENV_REDIS_URL,
+)
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -148,6 +156,44 @@ def test_dynoscale_agent_complains_about_invalid_environment(env_invalid, caplog
         assert len(caplog.record_tuples) == 1
         assert caplog.record_tuples[0][1] == logging.INFO
         assert "Throwing away" in caplog.record_tuples[0][2]
+
+
+def test_agent_does_not_attempt_to_start_rq_logger_when_none_of_the_supported_redis_urls_in_environ(
+        repo_path,
+        env_valid,
+        monkeypatch
+):
+    from dynoscale.agent import DynoscaleAgent
+    da = DynoscaleAgent(repository_path=repo_path)
+
+    assert not da.config.is_rq_available
+    monkeypatch.setenv("UNKNOWN_REDIS_URL", "redis://localhost:3306")
+    da = DynoscaleAgent(repository_path=repo_path)
+    assert not da.config.is_rq_available
+
+
+@pytest.mark.parametrize(
+    "p_environ, p_redis_url", [
+        (ENV_REDIS_URL, "redis://localhost:3306"),
+        (ENV_REDISTOGO_URL, "redis://localhost:3306"),
+        (ENV_REDISCLOUD_URL, "redis://localhost:3306"),
+        (ENV_OPENREDIS_URL, "redis://localhost:3306"),
+        (ENV_REDISGREEN_URL, "redis://localhost:3306"),
+    ]
+)
+def test_agent_attempts_to_start_rq_logger_when_any_of_the_supported_redis_urls_in_environ(
+        repo_path,
+        env_set_dyno_web1,
+        env_set_dynoscale_url,
+        monkeypatch,
+        p_environ,
+        p_redis_url
+):
+    from dynoscale.agent import DynoscaleAgent
+
+    monkeypatch.setenv(p_environ, p_redis_url)
+    da = DynoscaleAgent(repository_path=repo_path)
+    assert da.config.is_rq_available
 
 
 @pytest.mark.asyncio

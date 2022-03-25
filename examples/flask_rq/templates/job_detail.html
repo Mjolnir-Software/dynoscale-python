@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %}Job Detail{% endblock %}</h1>
+    {% if not  job %}
+        <h3 style="color: red">No such job!</h3>
+    {% else %}
+        <h3>{{ job.get_id() }}</h3>
+        <div>Is queued: {{ job.is_queued }}</div>
+        <div>Is scheduled: {{ job.is_scheduled }}</div>
+        <div>Is deferred: {{ job.is_deferred }}</div>
+        <div>Is started: {{ job.is_started }}</div>
+        <div>Is stopped: {{ job.is_stopped }}</div>
+        <div>Is canceled: {{ job.is_canceled }}</div>
+        <div>Is finished: {{ job.is_finished }}</div>
+        <div>Created at: {{ job.created_at }}</div>
+        <div>Enqueued at: {{ job.enqueued_at }}</div>
+        <div>Started at: {{ job.started_at }}</div>
+        <div>Ended at: {{ job.ended_at }}</div>
+        <div>Description: {{ job.description }}</div>
+        <div>Func name: {{ job.func_name }}</div>
+        <div>Data: {{ job.data }}</div>
+        <div>Result: {{ job.result }}</div>
+        <div>Ttl: {{ job.ttl }}</div>
+        <div>Worker name: {{ job.worker_name }}</div>
+    {% endif %}
+{% endblock %}

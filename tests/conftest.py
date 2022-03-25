@@ -1,11 +1,14 @@
+import os
+import signal
 import threading
 import uuid
 
 import pytest
 import responses
+from redislite import Redis as Redislite
 
-from dynoscale.constants import ENV_DEV_MODE, ENV_HEROKU_DYNO, ENV_DYNOSCALE_URL
 from dynoscale.agent import DynoscaleAgent
+from dynoscale.constants import *
 from dynoscale.repository import DynoscaleRepository
 
 
@@ -43,6 +46,20 @@ def env_set_dyno_release1(monkeypatch):
 
 
 @pytest.fixture
+def env_set_redis_url_localhost(monkeypatch):
+    monkeypatch.setenv(ENV_REDIS_URL, 'redis://127.0.0.1:6379')
+
+
+@pytest.fixture
+def env_set_redis_url_all(monkeypatch):
+    monkeypatch.setenv(ENV_REDIS_URL, 'redis://127.0.0.1:6379')
+    monkeypatch.setenv(ENV_REDISGREEN_URL, 'redis://127.0.0.1:6379')
+    monkeypatch.setenv(ENV_REDISTOGO_URL, 'redis://127.0.0.1:6379')
+    monkeypatch.setenv(ENV_REDISCLOUD_URL, 'redis://127.0.0.1:6379')
+    monkeypatch.setenv(ENV_OPENREDIS_URL, 'redis://127.0.0.1:6379')
+
+
+@pytest.fixture
 def env_del_dyno(monkeypatch):
     monkeypatch.delenv(ENV_HEROKU_DYNO, raising=False)
 
@@ -55,6 +72,21 @@ def env_set_dynoscale_url(monkeypatch, mock_url):
 @pytest.fixture
 def env_del_dynoscale_url(monkeypatch):
     monkeypatch.delenv(ENV_DYNOSCALE_URL, raising=False)
+
+
+@pytest.fixture
+def env_del_redis_url(monkeypatch):
+    monkeypatch.delenv(ENV_REDIS_URL, raising=False)
+
+
+@pytest.fixture
+def env_del_redis_all(monkeypatch):
+    monkeypatch.delenv(ENV_REDIS_URL, raising=False)
+    monkeypatch.delenv(ENV_REDIS_URL, raising=False)
+    monkeypatch.delenv(ENV_REDISGREEN_URL, raising=False)
+    monkeypatch.delenv(ENV_REDISTOGO_URL, raising=False)
+    monkeypatch.delenv(ENV_REDISCLOUD_URL, raising=False)
+    monkeypatch.delenv(ENV_OPENREDIS_URL, raising=False)
 
 
 @pytest.fixture
@@ -140,3 +172,32 @@ def mocked_api_200_with_publish_frequency_30(mock_url):
 def ds_event_logger(repo_path, env_valid, ds_repository) -> DynoscaleAgent:
     ds_agent = DynoscaleAgent(repository_path=repo_path)
     return ds_agent
+
+
+@pytest.fixture
+def env_set_redis_url_redislite(monkeypatch, redislite_url):
+    monkeypatch.setenv(ENV_REDIS_URL, redislite_url)
+
+
+@pytest.fixture
+def redislite_db_path(tmp_path_factory):
+    yield tmp_path_factory.mktemp("data").joinpath("redis.db")
+
+
+@pytest.fixture
+def redislite_db_port():
+    return 46379
+
+
+@pytest.fixture
+def redislite_url(redislite_db_port):
+    return f"redis://127.0.0.1:{redislite_db_port}"
+
+
+@pytest.fixture
+def redislite(redislite_db_path, redislite_db_port) -> Redislite:
+    rc = Redislite(redislite_db_path, serverconfig={'port': f"{redislite_db_port}"})
+    yield rc
+    rc.close()
+    rc.shutdown()
+    # os.kill(rc.pid, signal.SIGTERM)

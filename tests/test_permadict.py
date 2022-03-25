@@ -47,7 +47,7 @@ def test_create(journal_mode, synchronous, tmpdir):
 
 def test_len():
     d = Permadict(thing=1, other=2)
-    assert len(d) is 2
+    assert len(d) == 2
 
 
 def test_set_and_get():
@@ -82,14 +82,14 @@ def test_clear():
     d["one"] = 1
     d["two"] = 2
 
-    assert len(d) is 2
+    assert len(d) == 2
     d.clear()
-    assert len(d) is 0
+    assert len(d) == 0
 
 
 def test_keys():
     d = Permadict(key="value")
-    assert len(list(d.keys())) is 1
+    assert len(list(d.keys())) == 1
     assert list(d.keys()) == ["key"]
 
 
@@ -102,7 +102,7 @@ def test_in():
 def test_iterator():
     d = Permadict(one=1, two=2)
     x = [d[key] for key in d]
-    assert len(x) is 2
+    assert len(x) == 2
     assert sorted(x) == [1, 2]
 
 
@@ -147,12 +147,12 @@ def test_pop():
 def test_update():
     other = dict(one=1, two=2)
     d = Permadict(**other)
-    assert len(d) is 2
+    assert len(d) == 2
     assert d["one"] == 1
     assert d["two"] == 2
 
     d.update({"one": 3, "three": 1}, )
-    assert len(d) is 3
+    assert len(d) == 3
     assert d["one"] == 3
     assert d["two"] == 2
     assert d["three"] == 1
@@ -160,7 +160,7 @@ def test_update():
     pairs = [("one", 1), ("three", 3), ("four", 4)]
     res = d.update(pairs, )
     assert res is None
-    assert len(d) is 4
+    assert len(d) == 4
     assert d["one"] == 1
     assert d["two"] == 2
     assert d["three"] == 3

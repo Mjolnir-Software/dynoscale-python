@@ -4,12 +4,13 @@ import pytest
 
 logging.basicConfig(level=logging.DEBUG)
 
-__clbl = lambda a, b: "c"
-
 
 @pytest.fixture
 def app():
-    return __clbl
+    def app_callable(a, b):
+        return "c"
+
+    return app_callable
 
 
 @pytest.fixture
@@ -25,20 +26,14 @@ def start_response():
     return ns
 
 
-def test_dynoscale_wsgi_app_doesnt_crash_with_invalid_settings(env_invalid, app):
+def test_dynoscale_wsgi_app_init_doesnt_crash_with_valid_settings(env_valid, app):
     from dynoscale.wsgi import DynoscaleWsgiApp
     DynoscaleWsgiApp(app)
 
 
-def test_dynoscale_wsgi_app_doesnt_crash_with_valid_settings(env_valid, app):
+def test_dynoscale_wsgi_app_init_doesnt_crash_with_invalid_settings(env_invalid, app):
     from dynoscale.wsgi import DynoscaleWsgiApp
     DynoscaleWsgiApp(app)
-
-
-def test_dynoscale_wsgi_app_call_doesnt_crash_with_invalid_settings(env_invalid, app, environ, start_response):
-    from dynoscale.wsgi import DynoscaleWsgiApp
-    dwa = DynoscaleWsgiApp(app)
-    dwa(environ, start_response)
 
 
 def test_dynoscale_wsgi_app_call_doesnt_crash_with_valid_settings(env_valid, app, environ, start_response):
@@ -47,15 +42,39 @@ def test_dynoscale_wsgi_app_call_doesnt_crash_with_valid_settings(env_valid, app
     dwa(environ, start_response)
 
 
-def test_dynoscale_wsgi_app_pre_request_doesnt_crash_with_invalid_settings(env_valid, app, environ, start_response):
+def test_dynoscale_wsgi_app_call_doesnt_crash_with_invalid_settings(env_invalid, app, environ, start_response):
     from dynoscale.wsgi import DynoscaleWsgiApp
     dwa = DynoscaleWsgiApp(app)
     dwa(environ, start_response)
-    dwa.log_queue_time(environ)
 
 
-def test_dynoscale_wsgi_app_pre_request_doesnt_crash_with_valid_settings(env_invalid, app, environ, start_response):
+def test_dynoscale_wsgi_app_call_doesnt_crash_ever(env_invalid, app, environ, start_response):
     from dynoscale.wsgi import DynoscaleWsgiApp
     dwa = DynoscaleWsgiApp(app)
+    dwa.config = None
     dwa(environ, start_response)
-    dwa.log_queue_time(environ)
+
+
+def test_dynoscale_wsgi_app_log_queue_time_doesnt_crash_with_valid_settings(env_invalid, app, environ, start_response):
+    from dynoscale.wsgi import DynoscaleWsgiApp
+    ds_app = DynoscaleWsgiApp(app)
+    ds_app(environ, start_response)
+    ds_app.log_queue_time(environ)
+
+
+def test_dynoscale_wsgi_app_log_queue_time_doesnt_crash_with_invalid_settings(
+        env_valid,
+        app,
+        environ,
+        start_response,
+        caplog
+):
+    from dynoscale.wsgi import DynoscaleWsgiApp
+    ds_app = DynoscaleWsgiApp(app)
+    ds_app(environ, start_response)
+    with caplog.at_level('INFO'):
+        caplog.clear()
+        ds_app.log_queue_time({})
+        assert caplog.record_tuples
+        assert len(caplog.record_tuples) == 1
+        assert caplog.record_tuples == [('dynoscale.wsgi.DynoscaleWsgiApp', 20, 'Can not calculate queue time.')]
