@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 
 import colorlog
@@ -35,4 +36,5 @@ dynoscale_app = DynoscaleWsgiApp(app.wsgi_app)
 if __name__ == "__main__":
     if 'wrap' in sys.argv:
         app.wsgi_app = dynoscale_app
-    app.run(host='127.0.0.1', port=3000, debug=True)
+    port = os.getenv('PORT', 3000)
+    app.run(host='0.0.0.0', port=port, debug=True)
