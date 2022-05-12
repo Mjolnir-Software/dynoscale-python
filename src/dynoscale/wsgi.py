@@ -36,6 +36,7 @@ class DynoscaleWsgiApp:
     def log_queue_time(self, environ):
         # Under no circumstances should we ever stop user app from receiving the request
         try:
+            self.logger.debug(f"log_queue_time (e:{environ})")
             log_start = epoch_ms()
             http_x_request_start = get_int_from_headers(
                 environ,
