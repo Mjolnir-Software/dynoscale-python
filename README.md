@@ -7,7 +7,7 @@
 1. Add __dynoscale__ to your app on Heroku: `heroku addons:create dscale`
 2. Install __dynoscale__:  `python -m pip install dynoscale`
     1. Add __dynoscale__ to your app, you can either wrap your app or if you use Gunicorn, you can also just use one of
-       its hooks (`pre_request``):
+       its hooks (`pre_request`):
         1. If you want to wrap you app (let's look at Flask example):
        ```python
        from flask import Flask
