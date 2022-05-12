@@ -2,6 +2,8 @@
 
 ### Future
 
+- updated version to 1.1.2
+
 ### 1.1.1 [2022-05-12]
 
 - fixed issue when using GUNICORN hook (Incorrect key name in headers)
