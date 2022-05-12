@@ -2,7 +2,7 @@ import logging
 
 from dynoscale.agent import DynoscaleAgent
 from dynoscale.config import Config
-from dynoscale.constants import HTTP_X_REQUEST_START
+from dynoscale.constants import X_REQUEST_START
 from dynoscale.utils import epoch_ms, get_int_from_headers, fake_request_start_ms
 
 PROC_NAME = '__dynoscale_hook_processor'
@@ -29,22 +29,26 @@ class GunicornHookProcessor:
             self.ds_agent = DynoscaleAgent()
         else:
             self.logger.warning(
-                f"Dynoscale can't start {GunicornHookProcessor.__name__} with invalid config: {self.config}.")
+                f"Dynoscale can't start {GunicornHookProcessor.__name__} with invalid config: {self.config}."
+            )
             return
 
     def pre_request(self, worker, req):
-        self.logger.debug(f"pre_request (w:{id(worker)} w.pid{worker.pid} rq:{id(req)})")
-        if self.config.is_not_valid:
-            # exit, immediately
-            return
-        log_start: int = epoch_ms()
-        http_x_request_start = get_int_from_headers(
-            req.headers,
-            HTTP_X_REQUEST_START,
-            fake_request_start_ms() if self.config.is_dev_mode else None
-        )
-        if isinstance(http_x_request_start, int):
-            req_queue_time = log_start - http_x_request_start
-            req_timestamp = int(log_start / 1_000)
-            self.logger.debug(f"pre_request - Logging queue time: {req_queue_time}")
-            self.ds_agent.log_queue_time(req_timestamp, req_queue_time)
+        # Under no circumstances should we ever stop user app from receiving the request
+        try:
+            self.logger.debug(f"pre_request (w:{id(worker)} w.pid{worker.pid} rq:{id(req)})")
+            log_start: int = epoch_ms()
+            http_x_request_start = get_int_from_headers(
+                req.headers,
+                X_REQUEST_START,
+                fake_request_start_ms() if self.config.is_dev_mode else None
+            )
+            if http_x_request_start is not None:
+                req_queue_time: int = log_start - http_x_request_start
+                req_timestamp = int(log_start / 1_000)
+                self.logger.debug(f"pre_request - Logging queue time: {req_queue_time}")
+                self.ds_agent.log_queue_time(req_timestamp, req_queue_time)
+            else:
+                self.logger.info("Can not calculate queue time.")
+        except Exception as e:
+            self.logger.error(f"Unknown error while attempting to log a queue time: {e}")

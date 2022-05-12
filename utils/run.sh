@@ -2,6 +2,7 @@
 
 CURRENT_DIR=$(pwd)
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+DIR_PROJECT_ROOT="$SCRIPT_DIR/.."
 DIR_FLASK_SIMPLE="$SCRIPT_DIR/../examples/flask_simple"
 DIR_FLASK_RQ="$SCRIPT_DIR/../examples/flask_rq"
 SET_ENV_DS_DEV_MINIMAL="env DYNOSCALE_DEV_MODE=1 DYNO=\"web.1\" DYNOSCALE_URL=\"https://httpbin.org/post\""
@@ -26,7 +27,7 @@ function run_flask_simple_script() {
   # First string argument is name
   # Second string argument will be executed
   echo "Running $1 now."
-  cd "$DIR_FLASK_SIMPLE" || exit
+  cd "$DIR_PROJECT_ROOT" || exit
   trap "trap_ctrl_c" 2
   echo "$SET_ENV_DS_DEV_MINIMAL $2"
   eval "$SET_ENV_DS_DEV_MINIMAL $2"
@@ -79,27 +80,27 @@ function show_options() {
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     case $REPLY in
     1)
-      run_flask_simple_script "$OPTION" "python3 flask_simple.py"
+      run_flask_simple_script "$OPTION" "python3 examples/flask_simple/flask_simple.py"
       break
       ;;
     2)
-      run_flask_simple_script "$OPTION" "gunicorn --config gunicorn.conf.py"
+      run_flask_simple_script "$OPTION" "gunicorn --config examples/flask_simple/gunicorn.conf.py"
       break
       ;;
     3)
-      run_flask_simple_script "$OPTION" "python3 flask_simple.py wrap"
+      run_flask_simple_script "$OPTION" "python3 examples/flask_simple/flask_simple.py wrap"
       break
       ;;
     4)
-      run_flask_simple_script "$OPTION" "gunicorn --config gunicorn_wrap.conf.py"
+      run_flask_simple_script "$OPTION" "gunicorn --config examples/flask_simple/gunicorn_wrap.conf.py"
       break
       ;;
     5)
-      run_flask_simple_script "$OPTION" "gunicorn --config gunicorn_hooks.conf.py"
+      run_flask_simple_script "$OPTION" "gunicorn --config examples/flask_simple/gunicorn_hooks.conf.py"
       break
       ;;
     6)
-      run_flask_simple_script "$OPTION" "gunicorn --config gunicorn_hooks_overload.conf.py"
+      run_flask_simple_script "$OPTION" "gunicorn --config examples/flask_simple/gunicorn_hooks_overload.conf.py"
       break
       ;;
     7)
