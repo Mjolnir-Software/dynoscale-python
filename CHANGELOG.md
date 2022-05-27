@@ -2,7 +2,11 @@
 
 ### Future
 
-- updated version to 1.1.2
+- updated version to 1.1.3
+
+### 1.1.2 [2022-05-27]
+
+- Added logging to DynoscaleRQLogger
 
 ### 1.1.1 [2022-05-12]
 
