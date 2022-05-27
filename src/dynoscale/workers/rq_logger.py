@@ -23,6 +23,7 @@ def get_oldest_queued_job(queue) -> Optional[Job]:
 
 def queue_time_records_for_connection(connection) -> Iterable[Record]:
     for queue in Queue.all(connection=connection):
+        logger.debug(f"Dynoscale getting oldest RQ job for queue: {queue.name}")
         oldest_job = get_oldest_queued_job(queue)
         if oldest_job is not None:
             queue_time_ms = int((datetime.datetime.utcnow() - oldest_job.enqueued_at).total_seconds() * 1000)
@@ -44,6 +45,7 @@ def get_queue_time_records() -> Iterable[Record]:
     for url_name, redis_url in get_redis_urls_from_environ().items():
         try:
             with redis_connection(redis_url) as conn:
+                logger.debug(f"Dynoscale getting RQ queue time records from Redis@{redis_url}")
                 for record in queue_time_records_for_connection(conn):
                     yield record
         except Exception as e:
@@ -53,6 +55,7 @@ def get_queue_time_records() -> Iterable[Record]:
 class DynoscaleRqLogger:
     def __init__(self, repository_path: Optional[Union[str, bytes, os.PathLike]] = None):
         self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscaleRqLogger.__name__}")
+        self.logger.debug("DynoscaleRqLogger initializing...")
         self.config = Config()
         if not self.config.is_rq_available:
             self.logger.warning("Rq not available, DynoscaleRqLogger will not initialize.")
@@ -66,6 +69,7 @@ class DynoscaleRqLogger:
                 return
             for record in get_queue_time_records():
                 try:
+                    self.logger.debug(f"DynoscaleRqLogger adding record: {record}")
                     self.repository.add_record(record)
                 except Exception as e:
                     logger.warning(f"DynoscaleRqLogger couldn't add record: {record} exception: {e} ")
