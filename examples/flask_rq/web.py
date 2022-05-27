@@ -25,7 +25,7 @@ handler.setFormatter(
     )
 )
 logging.getLogger("").handlers = [handler]
-logging.getLogger("dynoscale").setLevel(logging.INFO)
+logging.getLogger("dynoscale").setLevel(logging.DEBUG)
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
