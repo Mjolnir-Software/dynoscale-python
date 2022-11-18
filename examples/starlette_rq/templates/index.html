@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% block title %}Home{% endblock %}</h2>
+    <h3>Hi! You have been here {{ hit_count }} times before!</h3>
+    {% if job %}
+        <h4>
+            Just enqueued job <a href="{{ url_for('jobs', job_id=job.get_id()) }}">{{ job.get_id() }}</a>
+            to {{ job.origin }} queue.
+        </h4>
+    {% endif %}
+    <h3 style='color:grey'>There are {{ q_urgent.count }} jobs in the urgent queue.</h3>
+    {% for job in q_urgent.jobs %}
+        <div class="job p-urgent">{{ job.enqueued_at }} - <a
+                href="{{ url_for('jobs', job_id=job.get_id()) }}">{{ job.get_id() }}</a></div>
+    {% endfor %}
+    <h3 style='color:grey'>There are {{ q_priority.count }} jobs in the priority queue.</h3>
+    {% for job in q_priority.jobs %}
+        <div class="job p-priority">{{ job.enqueued_at }} - <a
+                href="{{ url_for('jobs', job_id=job.get_id() ) }}">{{ job.get_id() }}</a></div>
+    {% endfor %}
+    <h3 style='color:grey'>There are {{ q_default.count }} jobs in the default queue.</h3>
+    {% for job in q_default.jobs %}
+        <div class="job p-default">{{ job.enqueued_at }} - <a
+                href="{{ url_for('jobs', job_id=job.get_id()) }}">{{ job.get_id() }}</a></div>
+    {% endfor %}
+{% endblock %}
