@@ -7,6 +7,7 @@ from typing import Optional
 import colorlog
 import redis
 import uvicorn
+from asgiref.typing import ASGI3Application
 from rq import Queue
 from rq.exceptions import NoSuchJobError
 from rq.job import Job
@@ -15,6 +16,7 @@ from starlette.responses import FileResponse
 from starlette.routing import Route
 from starlette.templating import Jinja2Templates
 
+from dynoscale.asgi import DynoscaleASGIApp
 from dynoscale.config import get_redis_urls_from_environ
 from worker import count_cycles_and_wait_a_bit
 
@@ -91,7 +93,7 @@ handler.setFormatter(
 logging.getLogger("").handlers = [handler]
 logging.getLogger("dynoscale").setLevel(logging.DEBUG)
 
-app = Starlette(debug=True, routes=routes)
+app: ASGI3Application = Starlette(debug=True, routes=routes)
 
 
 def get_hit_count():
@@ -142,6 +144,6 @@ if __name__ == "__main__":
     init_redis_conn_and_queues(redis_url)
 
     print(f"Starting Starlette server, sending RQ jobs to redis @ {redis_url}")
-    uvicorn.run(app, port=os.getenv('PORT', 3000), log_level="info")
+    uvicorn.run(DynoscaleASGIApp(app), port=os.getenv('PORT', 8000), log_level="info")
 else:
     init_redis_conn_and_queues()

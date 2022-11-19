@@ -6,7 +6,13 @@ from contextlib import nullcontext as does_not_raise
 import pytest
 import responses
 
-from dynoscale.utils import get_str_from_headers, fake_request_start_ms, is_valid_url, get_int_from_headers
+from dynoscale.utils import (
+    get_str_from_headers,
+    fake_request_start_ms,
+    is_valid_url,
+    get_int_from_headers,
+    get_int_from_bytestring_headers,
+)
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -48,6 +54,27 @@ def test_get_int_from_headers_as_dict(key, result, headers, expectation):
             assert get_int_from_headers(key=key, headers=headers) is None
         else:
             assert get_int_from_headers(key=key, headers=headers) == result
+
+
+@pytest.mark.parametrize(
+    "key, result, headers, expectation",
+    [
+        # valid
+        ("key", None, [], does_not_raise()),
+        ("x-http-response-start", 10, [(b'X-HTTP-RESPONSE-START', b'10',)], does_not_raise()),
+        ("x-http-response-start", 20, [(b'X-HTTP-RESPONSE-START', b'20', b'21',)], does_not_raise()),
+        ("X-http-response-start", 30, [[b'X-HTTP-RESPONSE-START', b'30']], does_not_raise()),
+        ("x-HTTP-response-start", None, [(b'X-HTTP-RESPONSE-START', "40")], does_not_raise()),
+        ("x-http-response-start", None, [(b'X-HTTP-RESPONSE-START', 40)], does_not_raise()),
+        ("x-http-response-start", None, [(b'X-HTTP-RESPONSE-START', 41)], does_not_raise()),
+    ],
+)
+def test_get_int_from_bytestring_headers(key, result, headers, expectation):
+    with expectation:
+        if result is None:
+            assert get_int_from_bytestring_headers(key=key, headers=headers) is None
+        else:
+            assert get_int_from_bytestring_headers(key=key, headers=headers) == result
 
 
 def test_get_str_from_headers_accepts_list():
