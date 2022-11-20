@@ -7,7 +7,6 @@ from typing import Optional
 import colorlog
 import redis
 import uvicorn
-from asgiref.typing import ASGI3Application
 from rq import Queue
 from rq.exceptions import NoSuchJobError
 from rq.job import Job
