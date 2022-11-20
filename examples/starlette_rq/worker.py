@@ -5,6 +5,8 @@ import time
 import redis
 from rq import Worker, Queue, Connection
 
+from dynoscale.config import get_redis_urls_from_environ
+
 if __name__ == '__main__':
     import argparse
 
@@ -24,6 +26,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     redis_url = os.getenv(args.redis_url_in, args.redis_url)
+    if redis_url is None:
+        urls_from_env = list(get_redis_urls_from_environ().values())
+        redis_url = urls_from_env[0] if urls_from_env else 'redis://127.0.0.1:6379'
+
     print(f"Starting RQ worker, will connect to redis @ {redis_url}")
     conn = redis.from_url(redis_url)
     with Connection(conn):
