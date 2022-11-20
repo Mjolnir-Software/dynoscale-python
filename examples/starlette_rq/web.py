@@ -143,6 +143,6 @@ if __name__ == "__main__":
     init_redis_conn_and_queues(redis_url)
 
     print(f"Starting Starlette server, sending RQ jobs to redis @ {redis_url}")
-    uvicorn.run('web:app', host="0.0.0.0", port=os.getenv('PORT', 8000), log_level="info")
+    uvicorn.run('web:app', host='0.0.0.0', port=int(os.getenv('PORT', '8000')), log_level="info")
 else:
     init_redis_conn_and_queues()
