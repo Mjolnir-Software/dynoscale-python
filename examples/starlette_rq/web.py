@@ -110,7 +110,7 @@ def get_hit_count():
 def init_redis_conn_and_queues(redis_url: Optional[str] = None):
     if redis_url is None:
         urls_from_env = list(get_redis_urls_from_environ().values())
-        redis_url = urls_from_env[0] if redis_url else 'redis://127.0.0.1:6379'
+        redis_url = urls_from_env[0] if urls_from_env else 'redis://127.0.0.1:6379'
     global conn
     global q_urgent
     global q_priority
