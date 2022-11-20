@@ -20,11 +20,11 @@ from dynoscale.asgi import DynoscaleASGIApp
 from dynoscale.config import get_redis_urls_from_environ
 from worker import count_cycles_and_wait_a_bit
 
-templates = Jinja2Templates(directory='./templates')
+templates = Jinja2Templates(directory=f"{os.path.dirname(__file__)}/templates")
 
 
 async def favicon(request):
-    return FileResponse("./favicon.ico")
+    return FileResponse(f"{os.path.dirname(__file__)}/favicon.ico")
 
 
 async def index(request):
