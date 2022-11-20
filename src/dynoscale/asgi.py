@@ -1,12 +1,11 @@
 import logging
-from pprint import pprint
 
 from asgiref.typing import ASGI3Application, ASGIReceiveCallable, ASGISendCallable, Scope
 
 from dynoscale.agent import DynoscaleAgent
 from dynoscale.config import Config
-from dynoscale.constants import HTTP_X_REQUEST_START
-from dynoscale.utils import epoch_ms, get_int_from_headers, fake_request_start_ms, get_int_from_bytestring_headers
+from dynoscale.constants import X_REQUEST_START
+from dynoscale.utils import epoch_ms, fake_request_start_ms, get_int_from_bytestring_headers
 
 
 class DynoscaleASGIApp(ASGI3Application):
@@ -46,7 +45,7 @@ class DynoscaleASGIApp(ASGI3Application):
             log_start = epoch_ms()
             http_x_request_start = get_int_from_bytestring_headers(
                 headers,
-                HTTP_X_REQUEST_START,
+                X_REQUEST_START,
                 fake_request_start_ms() if self.config.is_dev_mode else None
             )
             if http_x_request_start is not None:
