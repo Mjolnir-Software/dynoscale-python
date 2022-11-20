@@ -93,7 +93,7 @@ handler.setFormatter(
 logging.getLogger("").handlers = [handler]
 logging.getLogger("dynoscale").setLevel(logging.DEBUG)
 
-app: ASGI3Application = Starlette(debug=True, routes=routes)
+app = DynoscaleASGIApp(Starlette(debug=True, routes=routes))
 
 
 def get_hit_count():
@@ -144,6 +144,6 @@ if __name__ == "__main__":
     init_redis_conn_and_queues(redis_url)
 
     print(f"Starting Starlette server, sending RQ jobs to redis @ {redis_url}")
-    uvicorn.run(DynoscaleASGIApp(app), port=os.getenv('PORT', 8000), log_level="info")
+    uvicorn.run('web:app', host="0.0.0.0", port=os.getenv('PORT', 8000), log_level="info")
 else:
     init_redis_conn_and_queues()
