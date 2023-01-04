@@ -41,7 +41,8 @@ def test_responses_from_another_thread(mock_url):
 
 
 def test_caplog(caplog):
-    logging.getLogger().info("simple %s", "caplog")
+    with caplog.at_level(logging.INFO):
+        logging.getLogger().info("simple %s", "caplog")
     assert caplog.record_tuples == [("root", logging.INFO, "simple caplog")]
 
 
