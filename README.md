@@ -161,8 +161,9 @@ Please check out `./examples`, yes, we do have examples in the repository :)
 
 ## 👩‍💻 Contributing
 
-Install development requirements by running `noglob pip install -e .[test]` if you use ZSH, or
-`pip install -e .[test]` if you're stuck with Bash.
+Install development requirements:
+ - If you use Zsh: `noglob pip install -e .[test]`
+ - If you use Bash: `pip install -e .[test]`
 
 You can run _pytest_ from terminal: `pytest`
 
