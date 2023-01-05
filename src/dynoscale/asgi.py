@@ -8,22 +8,22 @@ from dynoscale.constants import X_REQUEST_START
 from dynoscale.utils import epoch_ms, fake_request_start_ms, get_int_from_bytestring_headers
 
 
-class DynoscaleASGIApp(ASGI3Application):
+class DynoscaleAsgiApp(ASGI3Application):
 
     def __init__(self, app: ASGI3Application) -> None:
-        self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscaleASGIApp.__name__}")
+        self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscaleAsgiApp.__name__}")
         self.logger.debug("__init__")
         self.__app = app
 
         self.config = Config()
         if self.config.is_not_valid:
             self.logger.warning(
-                f"{DynoscaleASGIApp.__name__} will not "
+                f"{DynoscaleAsgiApp.__name__} will not "
                 f"initialize {DynoscaleAgent.__name__} with invalid config: {self.config}."
             )
             return  # User app will keep running, but queue times won't be logged
         self.ds_agent = DynoscaleAgent()
-        self.logger.info(f"{DynoscaleASGIApp.__name__} started in {self.config.run_mode_name} mode.")
+        self.logger.info(f"{DynoscaleAsgiApp.__name__} started in {self.config.run_mode_name} mode.")
 
     async def __call__(self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable) -> None:
         # Under no circumstances should we ever stop user's app from receiving the request
