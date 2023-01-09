@@ -15,15 +15,12 @@ logger = logging.getLogger(__name__)
 request_log_queue = queue.Queue()
 
 
-def queue_time_logger(
-        repository_path: Optional[Union[str, bytes, os.PathLike]] = None,
-        enable_rq_logger: bool = False
-):
+def queue_time_logger(enable_rq_logger: bool):
     logger.debug("queue_time_logger")
-    publisher = DynoscalePublisher(repository_path)
+    publisher = DynoscalePublisher()
     if enable_rq_logger:
         from dynoscale.workers.rq_logger import DynoscaleRqLogger
-        rq_logger = DynoscaleRqLogger(repository_path)
+        rq_logger = DynoscaleRqLogger()
         publisher.pre_publish_hook = rq_logger.log_queue_times
 
     while True:
@@ -35,10 +32,7 @@ def queue_time_logger(
 
 class DynoscaleAgent:
 
-    def __init__(
-            self,
-            repository_path: Optional[Union[str, bytes, os.PathLike]] = None
-    ):
+    def __init__(self):
         self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscaleAgent.__name__}")
         self.logger.debug("__init__")
         self.config = Config()
@@ -47,7 +41,6 @@ class DynoscaleAgent:
                 target=queue_time_logger,
                 daemon=True,
                 kwargs={
-                    'repository_path': repository_path,
                     'enable_rq_logger': self.config.is_rq_available,
                 },
                 name='Dynoscale'

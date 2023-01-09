@@ -19,7 +19,7 @@ def req():
     return req
 
 
-def test_gunicorn_doesnt_crash_with_invalid_settings(env_invalid, worker, req):
+def test_gunicorn_doesnt_crash_with_invalid_settings(env_invalid_missing_dyno, worker, req):
     from dynoscale.hooks.gunicorn import GunicornHookProcessor
     g = GunicornHookProcessor()
     g.pre_request(worker, req)
@@ -31,7 +31,7 @@ def test_gunicorn_doesnt_crash_with_valid_settings(env_valid, worker, req):
     g.pre_request(worker, req)
 
 
-def test_gunicorn_pre_request_doesnt_crash_with_valid_settings(env_invalid, worker, req):
+def test_gunicorn_pre_request_doesnt_crash_with_valid_settings(env_invalid_missing_dyno, worker, req):
     from dynoscale.hooks.gunicorn import GunicornHookProcessor
     g = GunicornHookProcessor()
     g.pre_request(worker, req)

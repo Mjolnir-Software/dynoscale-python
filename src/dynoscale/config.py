@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Dict
 
 from dynoscale.constants import *
+from dynoscale.repository import DEFAULT_DYNOSCALE_REPOSITORY_FILENAME
 from dynoscale.utils import is_valid_url, ensure_module
 
 
@@ -40,16 +41,24 @@ class Config:
     def is_rq_available(self) -> bool:
         return ensure_module('rq') is not None and ensure_module('redis') is not None and self.redis_urls
 
+    @property
+    def repository_path(self) -> bytes:
+        return os.path.join(self.repository_dir_name, self.repository_file_name)
+
     def __init__(self):
         self.is_dev_mode = bool(os.environ.get(ENV_DEV_MODE, False))
         self.dyno = os.environ.get(ENV_HEROKU_DYNO)
         self.url = os.environ.get(ENV_DYNOSCALE_URL)
         self.redis_urls = get_redis_urls_from_environ()
+        self.repository_dir_name = os.environ.get(ENV_DYNOSCALE_DATA_DIR_NAME, os.getcwd())
+        self.repository_file_name = os.environ.get(ENV_DYNOSCALE_DATA_FILE_NAME, DEFAULT_DYNOSCALE_REPOSITORY_FILENAME)
 
     def __repr__(self) -> str:
-        obj = {ENV_DEV_MODE: self.is_dev_mode,
-               ENV_HEROKU_DYNO: self.dyno,
-               ENV_DYNOSCALE_URL: self.url,
-               'redis_urls': self.redis_urls
-               }
+        obj = {
+            ENV_DEV_MODE: self.is_dev_mode,
+            ENV_HEROKU_DYNO: self.dyno,
+            ENV_DYNOSCALE_URL: self.url,
+            'redis_urls': self.redis_urls,
+            'repository_path': self.repository_path
+        }
         return json.dumps(obj, skipkeys=True, sort_keys=True)

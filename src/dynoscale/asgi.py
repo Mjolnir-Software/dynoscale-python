@@ -32,6 +32,8 @@ class DynoscaleAsgiApp(ASGI3Application):
             if scope.get('type') == 'http' and self.config.is_valid:
                 self.logger.debug("Scope type is `http` and config is valid.")
                 self.log_queue_time(scope.get('headers'))
+            else:
+                self.logger.debug("Scope type is not `http`.")
         except Exception as e:
             self.logger.error(f"Unknown error, while processing ASGI __call__ {e}")
         finally:
@@ -54,6 +56,6 @@ class DynoscaleAsgiApp(ASGI3Application):
                 self.logger.debug(f"log_queue_time - Logging queue time {req_queue_time}")
                 self.ds_agent.log_queue_time(req_timestamp, req_queue_time)
             else:
-                self.logger.info("Can not calculate queue time.")
+                self.logger.info("log_queue_time - Can not calculate queue time.")
         except Exception as e:
             self.logger.error(f"Unknown error while attempting to log a queue time: {e}")

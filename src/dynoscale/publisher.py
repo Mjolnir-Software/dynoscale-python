@@ -124,10 +124,10 @@ class DynoscalePublisher:
     def publish_frequency(self, seconds: float):
         self.repository[KEY_PUBLISH_FREQUENCY] = seconds
 
-    def __init__(self, repository_path: Optional[Union[str, bytes, os.PathLike]] = None):
+    def __init__(self):
         self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscalePublisher.__name__}")
         self.config: Config = Config()
-        self.repository: DynoscaleRepository = DynoscaleRepository(repository_path)
+        self.repository: DynoscaleRepository = DynoscaleRepository(self.config.repository_path)
         self.session: Session = Session()
         self.pre_publish_hook: Optional[Callable] = None
 

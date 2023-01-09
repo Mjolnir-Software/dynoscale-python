@@ -141,7 +141,7 @@ def test_config_from_response_doesnt_log_error_on_empty(caplog, mock_url, mocked
         caplog.clear()
 
 
-def test_dynoscale_agent_complains_about_invalid_environment(env_invalid, caplog):
+def test_dynoscale_agent_complains_about_invalid_environment(env_invalid_missing_dyno, caplog):
     from dynoscale.agent import DynoscaleAgent
     with caplog.at_level(logging.WARNING):
         ds_agent = DynoscaleAgent()
@@ -159,16 +159,15 @@ def test_dynoscale_agent_complains_about_invalid_environment(env_invalid, caplog
 
 
 def test_agent_does_not_attempt_to_start_rq_logger_when_none_of_the_supported_redis_urls_in_environ(
-        repo_path,
         env_valid,
         monkeypatch
 ):
     from dynoscale.agent import DynoscaleAgent
-    da = DynoscaleAgent(repository_path=repo_path)
+    da = DynoscaleAgent()
 
     assert not da.config.is_rq_available
     monkeypatch.setenv("UNKNOWN_REDIS_URL", "redis://localhost:3306")
-    da = DynoscaleAgent(repository_path=repo_path)
+    da = DynoscaleAgent()
     assert not da.config.is_rq_available
 
 
@@ -182,7 +181,6 @@ def test_agent_does_not_attempt_to_start_rq_logger_when_none_of_the_supported_re
     ]
 )
 def test_agent_attempts_to_start_rq_logger_when_any_of_the_supported_redis_urls_in_environ(
-        repo_path,
         env_set_dyno_web1,
         env_set_dynoscale_url,
         monkeypatch,
@@ -192,7 +190,7 @@ def test_agent_attempts_to_start_rq_logger_when_any_of_the_supported_redis_urls_
     from dynoscale.agent import DynoscaleAgent
 
     monkeypatch.setenv(p_environ, p_redis_url)
-    da = DynoscaleAgent(repository_path=repo_path)
+    da = DynoscaleAgent()
     assert da.config.is_rq_available
 
 

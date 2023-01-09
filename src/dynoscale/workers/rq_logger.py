@@ -53,14 +53,14 @@ def get_queue_time_records() -> Iterable[Record]:
 
 
 class DynoscaleRqLogger:
-    def __init__(self, repository_path: Optional[Union[str, bytes, os.PathLike]] = None):
+    def __init__(self):
         self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscaleRqLogger.__name__}")
         self.logger.debug("DynoscaleRqLogger initializing...")
         self.config = Config()
         if not self.config.is_rq_available:
             self.logger.warning("Rq not available, DynoscaleRqLogger will not initialize.")
             return
-        self.repository = DynoscaleRepository(repository_path)
+        self.repository = DynoscaleRepository(self.config.repository_path)
 
     def log_queue_times(self):
         try:  # Under no circumstances should log_queue_times crash

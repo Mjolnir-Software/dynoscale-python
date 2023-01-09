@@ -104,11 +104,11 @@ def test_get_queue_time_records(env_set_redis_url_redislite, redislite):
     assert len(records) == 2
 
 
-def test_dynoscale_rq_logger_log_queue_times(repo_path, env_set_redis_url_redislite, redislite):
+def test_dynoscale_rq_logger_log_queue_times(env_valid, env_set_redis_url_redislite, redislite):
     q1 = Queue(connection=redislite)
     q1.enqueue_call(func=rq_mock_job)
 
-    ds_rql = DynoscaleRqLogger(repository_path=repo_path)
+    ds_rql = DynoscaleRqLogger()
     ds_rql.log_queue_times()
     records = ds_rql.repository.get_all_records()
     assert len(records) == 1
