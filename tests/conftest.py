@@ -35,7 +35,7 @@ def env_valid(env_set_dyno_web1, env_set_dynoscale_url, env_set_data_dir_name, e
 
 @pytest.fixture()
 def mock_url():
-    yield f"https://api.org/{uuid.uuid4()}"
+    yield f"https://localhost/{uuid.uuid4()}"
 
 
 # Environment variables
@@ -77,17 +77,8 @@ def env_del_dyno(monkeypatch):
 
 @pytest.fixture
 def env_set_dynoscale_url(monkeypatch, mock_url):
-    print("### env_set_dynoscale_url ###")
-
     monkeypatch.setenv(ENV_DYNOSCALE_URL, mock_url)
-
-    print(f"{ENV_HEROKU_DYNO}: {os.environ.get(ENV_HEROKU_DYNO, '### MISSING ###')}")
-    print(f"{ENV_DYNOSCALE_URL}: {os.environ.get(ENV_DYNOSCALE_URL, '### MISSING ###')}")
-    print(f"{ENV_DYNOSCALE_DATA_DIR_NAME}: {os.environ.get(ENV_DYNOSCALE_DATA_DIR_NAME, '### MISSING ###')}")
-    print(f"{ENV_DYNOSCALE_DATA_FILE_NAME}: {os.environ.get(ENV_DYNOSCALE_DATA_FILE_NAME, '### MISSING ###')}")
-    print("## env_set_dynoscale_url yielding ##")
     yield
-    print("## env_set_dynoscale_url back after yield ##")
 
 
 @pytest.fixture

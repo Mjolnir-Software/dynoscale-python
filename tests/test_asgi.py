@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from pprint import pprint
 
@@ -7,10 +8,11 @@ from asgiref.typing import (
     ASGIReceiveCallable,
     ASGISendCallable,
     ASGI3Application,
-    ASGIReceiveEvent,
     HTTPRequestEvent,
 )
 from starlette.responses import Response
+
+from dynoscale.config import Config
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -66,9 +68,12 @@ def asgi_send_callable() -> ASGISendCallable:
 def asgi_scope_http() -> Scope:
     return {
         'type': "http",
-        'headers': {
-            "HTTP_X_REQUEST_START": "1234123434"
-        }
+        'headers': [
+            [b"X-REQUEST-START", b"1234123434"],
+        ],
+        'path': '/',
+        'method': 'GET',
+
     }
 
 
@@ -176,16 +181,16 @@ async def test_dynoscale_asgi_logs_queue_time(
         asgi_scope_http,
         asgi_receive_callable,
         asgi_send_callable,
-        caplog,
-        ds_repository
+        caplog
 ):
     from dynoscale.asgi import DynoscaleAsgiApp
     ds_app = DynoscaleAsgiApp(asgi_app)
     with caplog.at_level(logging.DEBUG):
         caplog.clear()
         await ds_app(asgi_scope_http, asgi_receive_callable, asgi_send_callable)
-        assert caplog.record_tuples
-        assert len(ds_repository.get_all_records()) == 1
+        await asyncio.sleep(0.1)
+        logged_add_record = [record for record in caplog.record_tuples if "add_record (" in record[2]]
+        assert len(logged_add_record) == 1
 
 
 @pytest.mark.asyncio
