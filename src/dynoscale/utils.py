@@ -53,13 +53,18 @@ def epoch_ms() -> int:
     return math.floor(time.time_ns() / 1_000_000)
 
 
-def ensure_module(name: str) -> Optional[ModuleType]:
-    if name in sys.modules:
-        return sys.modules.get(name, None)
-    elif find_spec(name) is not None:
-        spec: ModuleSpec = find_spec(name)
+def ensure_module(module_name: str) -> Optional[ModuleType]:
+    """
+    Dynamically loads and returns a module if it is available. 
+    :param module_name: Name of the module
+    :return: Loaded module or None if module not available
+    """
+    if module_name in sys.modules:
+        return sys.modules.get(module_name, None)
+    elif find_spec(module_name) is not None:
+        spec: ModuleSpec = find_spec(module_name)
         module: ModuleType = module_from_spec(spec)
-        sys.modules[name] = module
+        sys.modules[module_name] = module
         spec.loader.exec_module(module)
         return module
 
