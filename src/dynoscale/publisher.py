@@ -1,11 +1,10 @@
 import csv
 import logging
-import os
 import time
 from dataclasses import dataclass
 from io import StringIO
 from json import JSONDecodeError
-from typing import Optional, Union, Iterable, Callable
+from typing import Optional, Iterable, Callable
 
 import requests
 from requests import Session, PreparedRequest, Response, Request

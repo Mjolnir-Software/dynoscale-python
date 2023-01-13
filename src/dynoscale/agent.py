@@ -1,8 +1,6 @@
 import logging
-import os
 import queue
 import threading
-from typing import Optional, Union
 
 from dynoscale.config import Config
 from dynoscale.publisher import DynoscalePublisher

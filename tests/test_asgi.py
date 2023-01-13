@@ -12,8 +12,6 @@ from asgiref.typing import (
 )
 from starlette.responses import Response
 
-from dynoscale.config import Config
-
 logging.basicConfig(level=logging.DEBUG)
 
 

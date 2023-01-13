@@ -1,8 +1,7 @@
 import datetime
 import logging
-import os
 from contextlib import contextmanager
-from typing import Optional, Union, Iterable, Generator
+from typing import Optional, Iterable, Generator
 
 import redis
 from rq import Queue
