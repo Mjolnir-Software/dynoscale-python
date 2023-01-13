@@ -1,7 +1,8 @@
-from tempfile import gettempdir
 import os
 import os.path as osp
 import sqlite3
+from tempfile import gettempdir
+
 import pytest
 
 from dynoscale.permadict import Permadict
