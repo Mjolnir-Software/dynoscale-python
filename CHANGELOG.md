@@ -1,8 +1,9 @@
 # Change Log of `dynoscale` for Python
 
-### Future
+### 1.1.3 [2023-01-13]
 
-- updated version to 1.1.3
+- Added support for ASGI through DynoscaleAsgiApp class
+- Added options to control DS repository storage location with environment variables
 
 ### 1.1.2 [2022-05-27]
 
