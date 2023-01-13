@@ -18,7 +18,7 @@ def on_exit_tear_down_threads():
 
 
 @pytest.fixture
-def env_invalid_missing_dyno(env_del_dyno,env_set_data_dir_name, env_set_data_file_name):
+def env_invalid_missing_dyno(env_del_dyno, env_set_data_dir_name, env_set_data_file_name):
     yield
 
 

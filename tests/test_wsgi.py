@@ -43,7 +43,11 @@ def test_dynoscale_wsgi_app_call_doesnt_crash_with_valid_settings(env_valid, app
 
 
 def test_dynoscale_wsgi_app_call_doesnt_crash_with_invalid_settings(
-        env_invalid_missing_dyno, app, environ, start_response):
+        env_invalid_missing_dyno,
+        app,
+        environ,
+        start_response
+):
     from dynoscale.wsgi import DynoscaleWsgiApp
     dwa = DynoscaleWsgiApp(app)
     dwa(environ, start_response)
@@ -57,7 +61,11 @@ def test_dynoscale_wsgi_app_call_doesnt_crash_ever(env_invalid_missing_dyno, app
 
 
 def test_dynoscale_wsgi_app_log_queue_time_doesnt_crash_with_valid_settings(
-        env_invalid_missing_dyno, app, environ, start_response):
+        env_invalid_missing_dyno,
+        app,
+        environ,
+        start_response
+):
     from dynoscale.wsgi import DynoscaleWsgiApp
     ds_app = DynoscaleWsgiApp(app)
     ds_app(environ, start_response)
