@@ -53,19 +53,24 @@ def epoch_ms() -> int:
     return math.floor(time.time_ns() / 1_000_000)
 
 
-def ensure_module(name: str) -> Optional[ModuleType]:
-    if name in sys.modules:
-        return sys.modules.get(name, None)
-    elif find_spec(name) is not None:
-        spec: ModuleSpec = find_spec(name)
+def ensure_module(module_name: str) -> Optional[ModuleType]:
+    """
+    Dynamically loads and returns a module if it is available. 
+    :param module_name: Name of the module
+    :return: Loaded module or None if module not available
+    """
+    if module_name in sys.modules:
+        return sys.modules.get(module_name, None)
+    elif find_spec(module_name) is not None:
+        spec: ModuleSpec = find_spec(module_name)
         module: ModuleType = module_from_spec(spec)
-        sys.modules[name] = module
+        sys.modules[module_name] = module
         spec.loader.exec_module(module)
         return module
 
 
 def get_int_from_headers(
-        headers: Union[dict, List[Tuple[str, str]]],
+        headers: Union[dict, List[Union[Tuple[str, str], Tuple[bytes, bytes]]]],
         key: str, default: Optional[int] = None
 ) -> Optional[int]:
     result = default
@@ -79,6 +84,27 @@ def get_int_from_headers(
         values = [i[1] for i in candidates if i[0].lower() == key.lower()]
         value = values[0] if len(values) > 0 else default
         result = int(value)
+    finally:
+        return result
+
+
+def get_int_from_bytestring_headers(
+        headers: List[Tuple[bytes, bytes]],
+        key: str, default: Optional[int] = None
+) -> Optional[int]:
+    result = default
+    if len(headers) < 1:
+        return result
+    try:
+        result = get_int_from_headers(
+            [
+                (str(row[0], "iso-8859-1"), str(row[1], "iso-8859-1"))
+                for row in headers if
+                (isinstance(row[0], bytes) and isinstance(row[1], bytes))
+            ],
+            key,
+            default
+        )
     finally:
         return result
 

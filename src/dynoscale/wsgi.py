@@ -16,8 +16,10 @@ class DynoscaleWsgiApp:
 
         self.config = Config()
         if self.config.is_not_valid:
-            self.logger.warning(f"{DynoscaleWsgiApp.__name__} will not "
-                                f"initialize {DynoscaleAgent.__name__} with invalid config: {self.config}.")
+            self.logger.warning(
+                f"{DynoscaleWsgiApp.__name__} will not "
+                f"initialize {DynoscaleAgent.__name__} with invalid config: {self.config}."
+                )
             return  # User app will keep running, but queue times won't be logged
         self.ds_agent = DynoscaleAgent()
         self.logger.info(f"{DynoscaleWsgiApp.__name__} started in {self.config.run_mode_name} mode.")

@@ -1,11 +1,10 @@
 import csv
 import logging
-import os
 import time
 from dataclasses import dataclass
 from io import StringIO
 from json import JSONDecodeError
-from typing import Optional, Union, Iterable, Callable
+from typing import Optional, Iterable, Callable
 
 import requests
 from requests import Session, PreparedRequest, Response, Request
@@ -124,10 +123,10 @@ class DynoscalePublisher:
     def publish_frequency(self, seconds: float):
         self.repository[KEY_PUBLISH_FREQUENCY] = seconds
 
-    def __init__(self, repository_path: Optional[Union[str, bytes, os.PathLike]] = None):
+    def __init__(self):
         self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscalePublisher.__name__}")
         self.config: Config = Config()
-        self.repository: DynoscaleRepository = DynoscaleRepository(repository_path)
+        self.repository: DynoscaleRepository = DynoscaleRepository(self.config.repository_path)
         self.session: Session = Session()
         self.pre_publish_hook: Optional[Callable] = None
 
@@ -182,4 +181,5 @@ class DynoscalePublisher:
             if config_response.publish_frequency != self.publish_frequency:
                 self.publish_frequency = config_response.publish_frequency
                 self.logger.info(
-                    f"Dynoscale updated publish frequency, next publish in {config_response.publish_frequency}s.")
+                    f"Dynoscale updated publish frequency, next publish in {config_response.publish_frequency}s."
+                )

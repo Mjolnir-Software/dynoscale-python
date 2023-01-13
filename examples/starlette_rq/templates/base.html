@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>starlette - {% block title %}{% endblock %}</title>
+    <style>
+        html {
+            font-family: sans-serif;
+            background-color: #0c0a26;
+            color: #ffcc00;
+        }
+        a {
+            color: #ba1919;
+        }
+
+        nav a {
+            background-color: #221659;
+            color: #ffb900;
+            padding: 0.75em;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        nav a:hover {
+            background-color: #ba1919;
+        }
+
+        nav a:active {
+            background-color: #f85d5d;
+        }
+    </style>
+</head>
+<body>
+<h1>🌟STARLETTE🌟example with RQ workers</h1>
+<nav>
+    <a class="button" href="{{ url_for('index') }}">home</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=urgent">new urgent job</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=priority">new priority job</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=default">new default job</a>
+</nav>
+<div class="content">
+    {% block content %} {% endblock %}
+</div>
+</body>
+</html>

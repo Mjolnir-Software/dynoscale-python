@@ -8,12 +8,13 @@ from dynoscale.config import Config
 logging.basicConfig(level=logging.DEBUG)
 
 
-def test_config_does_not_crash_with_missing_env_vars(env_invalid):
+def test_config_does_not_crash_with_missing_env_vars(env_invalid_missing_dyno):
     Config()
 
 
 def test_config_with_valid_environ_vars_is_valid(env_valid):
-    assert Config().is_valid
+    config = Config()
+    assert config.is_valid
 
 
 def test_config_with_dyno_missing_in_environ_is_invalid(env_set_dynoscale_url, env_del_dyno):
@@ -28,7 +29,7 @@ def test_config_with_valid_env_vars_and_dev_mode_is_valid(env_valid):
     assert Config().is_valid
 
 
-def test_config_with_invalid_env_vars_and_dev_mode_is_invalid(env_invalid, monkeypatch):
+def test_config_with_invalid_env_vars_and_dev_mode_is_invalid(env_invalid_missing_dyno, monkeypatch):
     c = Config()
     assert not c.is_valid
 
@@ -78,7 +79,7 @@ def test_config_with_invalid_env_vars_and_dev_mode_is_invalid(env_invalid, monke
         # ([], pytest.raises(ZeroDivisionError)),
     ],
 )
-def test_config_with_env_vars(env_invalid, monkeypatch, dyno, url, is_valid, expectation):
+def test_config_with_env_vars(env_invalid_missing_dyno, monkeypatch, dyno, url, is_valid, expectation):
     from dynoscale.constants import ENV_DYNOSCALE_URL
     from dynoscale.constants import ENV_HEROKU_DYNO
     if dyno is not None:

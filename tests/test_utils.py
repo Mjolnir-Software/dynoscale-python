@@ -6,12 +6,42 @@ from contextlib import nullcontext as does_not_raise
 import pytest
 import responses
 
-from dynoscale.utils import get_str_from_headers, fake_request_start_ms, is_valid_url, get_int_from_headers
+from dynoscale.utils import (
+    get_str_from_headers,
+    fake_request_start_ms,
+    is_valid_url,
+    get_int_from_headers,
+    get_int_from_bytestring_headers,
+    ensure_module,
+)
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 # ========================= TESTS =============================
+def test_ensure_module_finds_imported_module():
+    # noinspection PyUnresolvedReferences
+    import random
+    a_random = ensure_module("random")
+    assert a_random is not None
+    assert a_random.__name__ == "random"
+    assert a_random.randint(1, 1) == 1
+
+
+def test_ensure_module_finds_existing_module():
+    a_tabnanny = ensure_module("tabnanny")
+    # tabnanny is in standard library, but shouldn't be imported not imported
+    # this is purely to test cover the else branch of ensure_module function
+    assert a_tabnanny is not None
+    assert a_tabnanny.__name__ == "tabnanny"
+    assert a_tabnanny.verbose == 0
+
+
+def test_ensure_module_doesnt_find_a_module():
+    a_module = ensure_module("this_module_for_sure_does_not_exist")
+    assert a_module is None
+
+
 # noinspection HttpUrlsUsage
 @pytest.mark.parametrize(
     "key, result, headers, expectation",
@@ -48,6 +78,27 @@ def test_get_int_from_headers_as_dict(key, result, headers, expectation):
             assert get_int_from_headers(key=key, headers=headers) is None
         else:
             assert get_int_from_headers(key=key, headers=headers) == result
+
+
+@pytest.mark.parametrize(
+    "key, result, headers, expectation",
+    [
+        # valid
+        ("key", None, [], does_not_raise()),
+        ("x-http-response-start", 10, [(b'X-HTTP-RESPONSE-START', b'10',)], does_not_raise()),
+        ("x-http-response-start", 20, [(b'X-HTTP-RESPONSE-START', b'20', b'21',)], does_not_raise()),
+        ("X-http-response-start", 30, [[b'X-HTTP-RESPONSE-START', b'30']], does_not_raise()),
+        ("x-HTTP-response-start", None, [(b'X-HTTP-RESPONSE-START', "40")], does_not_raise()),
+        ("x-http-response-start", None, [(b'X-HTTP-RESPONSE-START', 40)], does_not_raise()),
+        ("x-http-response-start", None, [(b'X-HTTP-RESPONSE-START', 41)], does_not_raise()),
+    ],
+)
+def test_get_int_from_bytestring_headers(key, result, headers, expectation):
+    with expectation:
+        if result is None:
+            assert get_int_from_bytestring_headers(key=key, headers=headers) is None
+        else:
+            assert get_int_from_bytestring_headers(key=key, headers=headers) == result
 
 
 def test_get_str_from_headers_accepts_list():

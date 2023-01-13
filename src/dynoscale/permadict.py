@@ -6,6 +6,8 @@ from contextlib import contextmanager
 if sys.version_info[:2] >= (3, 8):
     from collections.abc import MutableMapping
 else:
+    # This could probably be removed since dynoscale only officially support python3.7 and up
+    # noinspection PyProtectedMember
     from collections import MutableMapping
 
 
