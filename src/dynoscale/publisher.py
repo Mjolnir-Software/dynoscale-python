@@ -181,4 +181,5 @@ class DynoscalePublisher:
             if config_response.publish_frequency != self.publish_frequency:
                 self.publish_frequency = config_response.publish_frequency
                 self.logger.info(
-                    f"Dynoscale updated publish frequency, next publish in {config_response.publish_frequency}s.")
+                    f"Dynoscale updated publish frequency, next publish in {config_response.publish_frequency}s."
+                )

@@ -38,7 +38,10 @@ class DynoscaleRepository(Permadict):
     def __init__(self, path: Optional[Union[str, bytes, os.PathLike]] = None, **kwargs):
         self.logger: logging.Logger = logging.getLogger(f"{__name__}.{DynoscaleRepository.__name__}")
         self.logger.debug("__init__")
-        db_filename = path if path else os.path.join(DEFAULT_DYNOSCALE_REPOSITORY_DIRNAME, DEFAULT_DYNOSCALE_REPOSITORY_FILENAME)
+        db_filename = path if path else os.path.join(
+            DEFAULT_DYNOSCALE_REPOSITORY_DIRNAME,
+            DEFAULT_DYNOSCALE_REPOSITORY_FILENAME
+            )
         self.db_existed = exists(db_filename)
         super().__init__(db_filename)
         self._create_log_table()
