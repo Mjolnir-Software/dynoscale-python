@@ -22,9 +22,10 @@ def queue_time_logger(enable_rq_logger: bool):
         publisher.pre_publish_hook = rq_logger.log_queue_times
 
     while True:
-        record: Record = request_log_queue.get()
+        record: Record = request_log_queue.get(block=True, timeout=None)
         logger.debug(f"queue_time_logger - got record from queue: {record}")
         publisher.repository.add_record(record)
+        logger.info(f"Queue time {record.metric}ms logged at {record.timestamp}.")
         publisher.tick()
 
 
@@ -59,4 +60,4 @@ class DynoscaleAgent:
             except queue.Full:
                 self.logger.error(f"Log queue is full, record {record} won't be logged!")
         else:
-            self.logger.info(f"Throwing away queue time for dyno {self.config.dyno}.")
+            self.logger.info(f"Throwing away queue time due to invalid config: {self.config}")

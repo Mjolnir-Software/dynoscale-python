@@ -1,14 +1,8 @@
 import pickle
 import sqlite3
-import sys
 from contextlib import contextmanager
 
-if sys.version_info[:2] >= (3, 8):
-    from collections.abc import MutableMapping
-else:
-    # This could probably be removed since dynoscale only officially support python3.7 and up
-    # noinspection PyProtectedMember
-    from collections import MutableMapping
+from collections.abc import MutableMapping
 
 
 # noinspection SqlNoDataSourceInspection,SqlResolve

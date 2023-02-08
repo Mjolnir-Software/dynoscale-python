@@ -20,9 +20,14 @@ There are generally 3 steps to set up autoscaling with Dynoscale:
 
 ### 1) Enabling Dynoscale add-on
 
-There are two ways to add the Dynoscale add-on to your app. Either you can add it through the broser from Heroku
-dashboard by navigating to _your app_, then selecting the _resources_ tab and finally searching for _Dynoscale_ then
-select your plan and at this point your app will be restarted.
+There are two ways to add the Dynoscale add-on to your app.  
+First one is to add the add-on through the Heroku dashboard by navigating to _your app_, then selecting the _resources_
+tab and finally searching for _dynoscale_ then select your plan and at this point your app will be restarted with the
+addon enabled.
+
+The second option is to install it with _heroku cli tools_, using this command for example:
+
+    heroku addons:create dscale:performance
 
 ### 2) Installing dynoscale agent package
 
@@ -32,7 +37,7 @@ If you'd like to confirm it's installed by heroku, then run:
 
     heroku run python -c "import dynoscale; print(dynoscale.__version__)"  
 
-which will print out the installed version (for example: `1.1.3`)
+which will print out the installed version (for example: `1.2.0`)
 
 If you'd like to confirm that dynoscale found the right env vars run:
 
@@ -46,7 +51,8 @@ and you'll likely see something like this:
 ### 3) Initialize dynoscale during the app startup
 
 This can take multiple forms and depends on your app. Is your app WSGI or ASGI? How do you serve it? Do you have
-workers?
+workers? There are [examples](https://github.com/Mjolnir-Software/dynoscale-python/tree/main/examples) in the repo, take
+a look! I hope you'll find something close to your setup.
 
 If you have a WSGI app _(ex.: Bottle, Flask, CherryPy, Pylons, Django, ...)_ and you serve the app with **Gunicorn**
 then in your `gunicorn.conf.py` just import the pre_request hook from dynoscale and that's it:
@@ -66,8 +72,22 @@ app = Flask(__name__)
 app.wsgi_app = DynoscaleWsgiApp(app.wsgi_app)
 ```
 
-If you have an ASGI app _(ex.: Starlette, Responder, FastAPI, Sanic, Django, Guillotina, ...)_ pass your ASGI app
-into DynoscaleASGIApp:
+Do you use Gunicorn with Uvicorn workers? Replace `uvicorn.workers.UvicornWorker`
+with `dynoscale.DynoscaleUvicornWorker` like so:
+
+```python
+# Contents of gunicorn.conf.py
+...
+# worker_class = 'uvicorn.workers.UvicornWorker'
+worker_class = 'dynoscale.uvicorn.DynoscaleUvicornWorker'
+...
+```
+
+... and you're done!
+
+Do you serve you ASGI app some other way? (ex.: Starlette, Responder, FastAPI, Sanic, Django, Guillotina, ...)_ wrap
+your ASGI app
+with DynoscaleASGIApp:
 
 ```python
 # `web.py` - Starlette Example
@@ -94,7 +114,7 @@ if __name__ == "__main__":
 
 ---
 
-## 📖 More info on usage
+## 📖 Complete WSGI example
 
 1. Add __dynoscale__ to your app on Heroku: `heroku addons:create dscale`
 2. Install __dynoscale__:  `python -m pip install dynoscale`
@@ -150,10 +170,69 @@ if __name__ == "__main__":
        ```
 3. __Profit!__ _Literally, this will save you money! 💰💰💰 😏_
 
+## 📖 Complete ASGI example
+
+1. Add __dynoscale__ to your app on Heroku: `heroku addons:create dscale`
+2. Prepare your amazing webapp, we'll use **Starlette** served by **Gunicorn** with **Uvicorn** workers:
+    ```python
+    # web.py
+    import datetime
+    from starlette.applications import Starlette
+    from starlette.responses import Response
+    from starlette.routing import Route
+    
+    
+    async def home(_):
+        return Response(
+            "Hello from 🌟 Starlette 🌟 served by Gunicorn using Uvicorn workers and scaled by Dynoscale!\n"
+            f"It's {datetime.datetime.now()} right now.",
+            media_type='text/plain'
+        )
+    
+    
+    app = Starlette(debug=True, routes=[Route('/', endpoint=home, methods=['GET'])])
+    ```
+   ... add Gunicorn config:
+    ```python
+    # gunicorn.conf.py
+    import os
+    # ENV vars
+    PORT = int(os.getenv('PORT', '3000'))
+    WEB_CONCURRENCY = int(os.getenv('WEB_CONCURRENCY', '10'))
+    
+    # Gunicorn config
+    wsgi_app = "web:app"
+    
+    # ┌---------- THIS HERE IS ALL OF DYNOSCALE SETUP ----------┐
+    # | # worker_class = 'uvicorn.workers.UvicornWorker'        |
+    worker_class = 'dynoscale.uvicorn.DynoscaleUvicornWorker' # |
+    # └---------------------------------------------------------┘
+    
+    bind = f"0.0.0.0:{PORT}"
+    preload_app = True
+    
+    workers = WEB_CONCURRENCY
+    max_requests = 1000
+    max_requests_jitter = 50
+    
+    accesslog = '-'
+    loglevel = 'debug'
+    ```
+3. Install all the dependencies:
+   - `python -m pip install "uvicorn[standard]" gunicorn dynoscale`
+4. Start it up with:
+   ```bash
+     DYNO=web.1 DYNOSCALE_DEV_MODE=true DYNOSCALE_URL=https://some_request_bin_or_some_such.com gunicorn
+   ```
+   - On Heroku, DYNO and DYNOSCALE_URL will be set for you, you should only have `web: gunicorn` in your procfile.
+   - In this example we start Dynoscale in dev mode to simulate random queue times, don't do this on Heroku!
+5. That's it you're done, now __Profit!__ _Literally, this will save you money! 💰💰💰 😏_
+
 ## ℹ️ Info
 
-You should consider the `dynoscale.wsgi.DynoscaleWsgiApp(wsgi_app)`
-and `dynoscale.hooks.gunicorn.pre_request(worker, req)` the only two bits of public interface.
+You should consider
+the `dynoscale.wsgi.DynoscaleWsgiApp(wsgi_app)`, `dynoscale.hooks.gunicorn.pre_request(worker, req)`, `dynoscale.asgi.DynoscaleASGIApp(asgi_app)`
+and `dynoscale.uvicorn.DynoscaleUvicornWorker` the only parts of the public interface.
 
 ## 🤯 Examples
 
@@ -162,8 +241,8 @@ Please check out `./examples`, yes, we do have examples in the repository :)
 ## 👩‍💻 Contributing
 
 Install development requirements:
- - If you use Zsh: `noglob pip install -e .[test]`
- - If you use Bash: `pip install -e .[test]`
+
+- `pip install -e ".[test]"`
 
 You can run _pytest_ from terminal: `pytest`
 
