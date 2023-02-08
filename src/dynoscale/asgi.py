@@ -56,6 +56,6 @@ class DynoscaleAsgiApp(ASGI3Application):
                 self.logger.debug(f"log_queue_time - Logging queue time {req_queue_time}")
                 self.ds_agent.log_queue_time(req_timestamp, req_queue_time)
             else:
-                self.logger.info("log_queue_time - Can not calculate queue time.")
+                self.logger.warning(f"Can not calculate queue time from request headers: {headers}")
         except Exception as e:
             self.logger.error(f"Unknown error while attempting to log a queue time: {e}")
