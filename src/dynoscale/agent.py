@@ -22,7 +22,7 @@ def queue_time_logger(enable_rq_logger: bool):
         publisher.pre_publish_hook = rq_logger.log_queue_times
 
     while True:
-        record: Record = request_log_queue.get()
+        record: Record = request_log_queue.get(block=True, timeout=None)
         logger.debug(f"queue_time_logger - got record from queue: {record}")
         publisher.repository.add_record(record)
         publisher.tick()
