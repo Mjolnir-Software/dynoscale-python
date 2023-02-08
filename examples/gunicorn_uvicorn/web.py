@@ -1,4 +1,3 @@
-#! /usr/bin/env python3
 import datetime
 from starlette.applications import Starlette
 from starlette.responses import Response
