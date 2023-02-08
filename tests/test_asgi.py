@@ -169,7 +169,7 @@ def test_dynoscale_asgi_app_log_queue_time_doesnt_crash_with_invalid_settings(
         assert caplog.record_tuples
         assert len(caplog.record_tuples) == 1
         assert caplog.record_tuples == [
-            ('dynoscale.asgi.DynoscaleAsgiApp', 20, 'log_queue_time - Can not calculate queue time.')]
+            ('dynoscale.asgi.DynoscaleAsgiApp', 30, 'Can not calculate queue time from request headers: {}')]
 
 
 @pytest.mark.asyncio
@@ -208,8 +208,11 @@ async def test_dynoscale_asgi_doesnt_log_queue_time_for_websocket_scope_type(
         await ds_app(asgi_scope_websocket, asgi_receive_callable, asgi_send_callable)
         assert caplog.record_tuples
         pprint(caplog.record_tuples)
-        assert caplog.record_tuples[0][2] == "__call__"
-        assert caplog.record_tuples[1][2] == "Scope type is not `http`."
+        messages = "".join(t[2] for t in caplog.record_tuples)
+        print(messages)
+        assert "__call__" in messages
+        assert "__init__" in messages
+        assert "Scope type is not `http`." in messages
         assert ds_repository.get_all_records() == ()
 
 
