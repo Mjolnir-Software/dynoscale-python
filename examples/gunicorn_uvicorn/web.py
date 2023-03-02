@@ -43,7 +43,7 @@ def waste_resources(cpu: int = 0, ram: int = 0, io: int = 0) -> str:
     return f"Successfully wasted {wasted_cpu}s on CPU tasks, {wasted_ram}s on RAM and {wasted_io}s waiting for IO."
 
 
-async def ep_home(_):
+async def route_index(_):
     return Response(
         "Hello from 🌟 Starlette 🌟 served by Gunicorn using Uvicorn workers and scaled by Dynoscale!\n"
         f"It's {datetime.datetime.now()} right now.",
@@ -51,21 +51,21 @@ async def ep_home(_):
     )
 
 
-async def ep_cpu(request):
+async def route_cpu(request):
     return Response(
         waste_resources(cpu=request.path_params.get('loop_count', 0)),
         media_type='text/plain'
     )
 
 
-async def ep_ram(request):
+async def route_ram(request):
     return Response(
         waste_resources(ram=request.path_params.get('loop_count', 0)),
         media_type='text/plain'
     )
 
 
-async def ep_io(request):
+async def route_io(request):
     return Response(
         waste_resources(io=request.path_params.get('loop_count', 0)),
         media_type='text/plain'
@@ -75,12 +75,12 @@ async def ep_io(request):
 app = Starlette(
     debug=True,
     routes=[
-        Route('/', ep_home),
-        Route('/cpu', ep_cpu),
-        Route('/ram', ep_ram),
-        Route('/io', ep_io),
-        Route('/cpu/{loop_count:int}', ep_cpu),
-        Route('/ram/{loop_count:int}', ep_ram),
-        Route('/io/{loop_count:int}', ep_io),
+        Route('/', route_index),
+        Route('/cpu', route_cpu),
+        Route('/ram', route_ram),
+        Route('/io', route_io),
+        Route('/cpu/{loop_count:int}', route_cpu),
+        Route('/ram/{loop_count:int}', route_ram),
+        Route('/io/{loop_count:int}', route_io),
     ]
 )
