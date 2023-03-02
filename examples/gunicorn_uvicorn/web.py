@@ -11,7 +11,7 @@ from starlette.routing import Route
 
 
 def waste_cpu() -> float:
-    return sum([math.atan2(math.sin(i), math.cos(i + 1)) for i in range(1, 100_000)])
+    return sum([math.atan2(math.sin(i), math.cos(i + 1)) for i in range(1, 10_000)])
 
 
 def waste_ram(megs: int = 16) -> int:
