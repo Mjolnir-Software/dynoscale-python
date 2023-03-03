@@ -6,8 +6,9 @@ import timeit
 from sys import getsizeof
 from textwrap import dedent
 
+import starlette.requests
 from starlette.applications import Starlette
-from starlette.responses import Response, HTMLResponse
+from starlette.responses import Response, HTMLResponse, PlainTextResponse
 from starlette.routing import Route
 
 
@@ -133,17 +134,29 @@ async def route_date(_):
     return Response(f"It's {datetime.datetime.now()} right now.", media_type='text/plain')
 
 
+async def route_info(request: starlette.requests.Request):
+    payload = ""
+    for k, v in request.scope.items():
+        payload += f"### {k.upper() + ' ':#<75}\n"
+        match v:
+            case dict():
+                payload += "\n".join(f"{kk:<32}: {vv}" for kk, vv in v.items())
+            case list():
+                payload += "\n".join(f"{vv}" for vv in v)
+            case _:
+                payload += f"{v}"
+        payload += "\n\n"
+    payload += f"### {'BODY' + ' ':#<75}\n"
+    payload += (await request.body()).decode('utf-8')
+    return PlainTextResponse(payload)
+
+
 async def route_waste_resources(request):
     sleep_ms = request.path_params.get('sleep_ms', 0)
     loop_count = request.path_params.get('loop_count', 0)
     ram_claim_megs = request.path_params.get('ram_claim_megs', 0)
     gc_claim_megs = request.path_params.get('gc_claim_megs', 0)
-
-    print(f"PRE:  {sleep_ms=} {loop_count=} {ram_claim_megs=} {gc_claim_megs=}")
-
     result_text = waste_resources(io=sleep_ms, cpu=loop_count, ram=ram_claim_megs, garbage=gc_claim_megs)
-
-    print(f"POST: {sleep_ms=} {loop_count=} {ram_claim_megs=} {gc_claim_megs=}")
     return Response(result_text, media_type='text/plain')
 
 
@@ -152,6 +165,7 @@ app = Starlette(
     routes=[
         Route('/', route_index),
         Route('/date', route_date),
+        Route('/info', route_info),
         Route('/io', route_waste_resources),
         Route('/cpu', route_waste_resources),
         Route('/ram', route_waste_resources),

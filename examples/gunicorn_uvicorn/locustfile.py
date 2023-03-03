@@ -7,9 +7,22 @@ class WebsiteUser(HttpUser):
     def on_start(self):
         self.client.get("/")
 
-    @task(10)
+    @task(5)
     def index(self):
         self.client.get("/")
+
+    @task(10)
+    def date(self):
+        self.client.get("/date")
+
+    @task(10)
+    def info(self):
+        self.client.get("/info")
+
+    @tag('io')
+    @task(3)
+    def io_1(self):
+        self.client.get("/io/1")
 
     @tag('cpu')
     @task(3)
@@ -17,26 +30,31 @@ class WebsiteUser(HttpUser):
         self.client.get("/cpu/1")
 
     @tag('ram')
-    @task(4)
+    @task(3)
     def ram_1(self):
         self.client.get("/ram/1")
 
+    @tag('gc')
+    @task(3)
+    def gc_1(self):
+        self.client.get("/gc/1")
+
     @tag('io')
-    @task(4)
-    def io_1(self):
-        self.client.get("/io/1")
+    @task
+    def io_5(self):
+        self.client.get("/io/5")
 
     @tag('cpu')
     @task
-    def cpu_2(self):
-        self.client.get("/cpu/2")
+    def cpu_5(self):
+        self.client.get("/cpu/5")
 
     @tag('ram')
     @task
-    def ram_2(self):
-        self.client.get("/ram/2")
+    def ram_5(self):
+        self.client.get("/ram/5")
 
-    @tag('io')
-    @task
-    def io_2(self):
-        self.client.get("/io/2")
+    @tag('gc')
+    @task()
+    def gc_5(self):
+        self.client.get("/gc/5")
