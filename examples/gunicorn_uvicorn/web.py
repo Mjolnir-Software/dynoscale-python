@@ -14,7 +14,7 @@ from starlette.routing import Route
 
 def waste_io(millis: int = 10) -> float:
     start = time.time()
-    if time:
+    if millis:
         time.sleep(millis / 1000.0)
     return time.time() - start
 
