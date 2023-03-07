@@ -1,10 +1,10 @@
 import os
 # noinspection PyUnresolvedReferences
-import log_config
+# import log_config
 
 # ENV vars
 PORT = int(os.getenv('PORT', '3000'))
-WEB_CONCURRENCY = int(os.getenv('WEB_CONCURRENCY', '10'))
+WEB_CONCURRENCY = int(os.getenv('WEB_CONCURRENCY', '20'))
 
 # Gunicorn config
 
@@ -20,4 +20,5 @@ max_requests = 1000
 max_requests_jitter = 25
 
 accesslog = '-'
-loglevel = 'debug'
+# loglevel = 'debug'
+loglevel = 'warning'
