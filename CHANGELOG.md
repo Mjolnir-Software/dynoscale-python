@@ -1,4 +1,8 @@
 # Change Log of `dynoscale` for Python
+
+### 1.2.1 [TBD]
+ - ...
+
 ### 1.2.0 [2023-01-08]
  - dropping support for Python 3.7, 3.8, 3.9
  - adding support for Gunicorn with Uvicorn workers, use dynoscale.uvicorn.DynoscaleUnicornWorker

@@ -6,7 +6,7 @@ __logo__ = """
  ██████╔╝   ██║   ██║ ╚████║╚██████╔╝███████║╚██████╗██║  ██║███████╗███████╗ 
  ╚═════╝    ╚═╝   ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝ 
 """
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 
 __title__ = "dynoscale"
 __description__ = "Simple yet efficient scaling agent for Python apps on Heroku."
