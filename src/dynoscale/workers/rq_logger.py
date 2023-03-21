@@ -1,11 +1,10 @@
-import datetime
 import logging
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Optional, Iterable, Generator
 
 import redis
 from rq import Queue
-from rq.job import Job
 
 from dynoscale.config import Config, get_redis_urls_from_environ
 from dynoscale.repository import DynoscaleRepository, Record
@@ -14,18 +13,18 @@ from dynoscale.utils import epoch_s
 logger = logging.getLogger(__name__)
 
 
-def get_oldest_queued_job(queue) -> Optional[Job]:
-    queued_jobs = [job for job in queue.jobs if job.is_queued]
-    sorted_jobs = sorted(queued_jobs, key=lambda job: job.enqueued_at)
-    return sorted_jobs[0] if sorted_jobs else None
+def get_enqueued_at_of_oldest_job(queue: Queue) -> Optional[datetime]:
+    jobs = queue.get_jobs(offset=0, length=1)
+    return jobs[0].enqueued_at if jobs else None
 
 
 def queue_time_records_for_connection(connection) -> Iterable[Record]:
+    utc_now = datetime.utcnow()
     for queue in Queue.all(connection=connection):
         logger.debug(f"Dynoscale getting oldest RQ job for queue: {queue.name}")
-        oldest_job = get_oldest_queued_job(queue)
-        if oldest_job is not None:
-            queue_time_ms = int((datetime.datetime.utcnow() - oldest_job.enqueued_at).total_seconds() * 1000)
+        oldest_job_enqueued_at = get_enqueued_at_of_oldest_job(queue)
+        if oldest_job_enqueued_at is not None:
+            queue_time_ms = int((utc_now - oldest_job_enqueued_at).total_seconds() * 1_000)
             yield Record(timestamp=epoch_s(), metric=queue_time_ms, source=f"rq:{queue.name}", metadata="")
 
 
