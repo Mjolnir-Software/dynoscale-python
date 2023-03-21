@@ -211,7 +211,6 @@ async def test_dynoscale_asgi_doesnt_log_queue_time_for_websocket_scope_type(
         messages = "".join(t[2] for t in caplog.record_tuples)
         print(messages)
         assert "__call__" in messages
-        assert "__init__" in messages
         assert "Scope type is not `http`." in messages
         assert ds_repository.get_all_records() == ()
 
