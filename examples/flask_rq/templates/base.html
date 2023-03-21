@@ -32,6 +32,13 @@
     <a class="button" href="{{ url_for('index') }}?queue_name=priority">new priority job</a>
     <a class="button" href="{{ url_for('index') }}?queue_name=default">new default job</a>
 </nav>
+<br>
+<br>
+<nav>
+    <a class="button" href="{{ url_for('index') }}?queue_name=urgent&job_count=10000">10 000 new urgent jobs</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=priority&job_count=10000">10 000 new priority jobs</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=default&job_count=10000">10 000 new default jobs</a>
+</nav>
 <div class="content">
     {% block content %} {% endblock %}
 </div>

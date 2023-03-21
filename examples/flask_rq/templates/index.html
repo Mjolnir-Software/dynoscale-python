@@ -3,23 +3,24 @@
 {% block content %}
     <h1>{% block title %}index{% endblock %}</h1>
     <h2>Hi! You have been here {{ hit_count }} times before!</h2>
-    {% if job %}
+    {% if jobs %}
         <h3>
-            Just enqueued job <a href='results/{{ job.get_id() }}'>{{ job.get_id() }}</a> to {{ job.origin }} queue.
+            Number of jobs added: {{ jobs|length }}. The last one is <a
+                href='results/{{ jobs[-1].get_id() }}'>{{ jobs[-1].get_id() }}</a> on {{ jobs[-1].origin }} queue.
         </h3>
     {% endif %}
-    <h3 style='color:grey'>There are {{ q_urgent.count }} jobs in the urgent queue.</h3>
-    {% for job in q_urgent.jobs %}
+    <h3 style='color:grey'>There are {{ q_urgent.count }} jobs in the urgent queue. Here are up to 25 oldest</h3>
+    {% for job in q_urgent.get_jobs(offset=0, length=25) %}
         <div class="job p-urgent">{{ job.enqueued_at }} - <a
                 href="{{ url_for('job_detail', job_id=job.get_id()) }}">{{ job.get_id() }}</a></div>
     {% endfor %}
-    <h3 style='color:grey'>There are {{ q_priority.count }} jobs in the priority queue.</h3>
-    {% for job in q_priority.jobs %}
+    <h3 style='color:grey'>There are {{ q_priority.count }} jobs in the priority queue. Here are up to 25 oldest</h3>
+    {% for job in q_priority.get_jobs(offset=0, length=25) %}
         <div class="job p-priority">{{ job.enqueued_at }} - <a
                 href="{{ url_for('job_detail', job_id=job.get_id() ) }}">{{ job.get_id() }}</a></div>
     {% endfor %}
-    <h3 style='color:grey'>There are {{ q_default.count }} jobs in the default queue.</h3>
-    {% for job in q_default.jobs %}
+    <h3 style='color:grey'>There are {{ q_default.count }} jobs in the default queue. Here are up to 25 oldest</h3>
+    {% for job in q_default.get_jobs(offset=0, length=25) %}
         <div class="job p-default">{{ job.enqueued_at }} - <a
                 href="{{ url_for('job_detail', job_id=job.get_id()) }}">{{ job.get_id() }}</a></div>
     {% endfor %}

@@ -46,26 +46,25 @@ def get_hit_count():
 @app.route('/')
 def index():
     queue_name = request.args.get('queue_name')
-    job = None
+    job_count = request.args.get('job_count', type=int, default=1)
+    jobs = None
     if queue_name == 'urgent':
-        job = q_urgent.enqueue_call(
-            func=count_cycles_and_wait_a_bit,
-            kwargs={'duration': 1.0},
+        jobs = q_urgent.enqueue_many(
+            [Queue.prepare_data(func=count_cycles_and_wait_a_bit, kwargs={'duration': 1.0}) for _ in range(job_count)]
         )
     elif queue_name == 'priority':
-        job = q_priority.enqueue_call(
-            func=count_cycles_and_wait_a_bit,
-            kwargs={'duration': 3.0},
+        jobs = q_priority.enqueue_many(
+            [Queue.prepare_data(func=count_cycles_and_wait_a_bit, kwargs={'duration': 3.0}) for _ in range(job_count)]
         )
     elif queue_name == 'default':
-        job = q_default.enqueue_call(
-            func=count_cycles_and_wait_a_bit,
-            kwargs={'duration': 5.0},
+        jobs = q_default.enqueue_many(
+            [Queue.prepare_data(func=count_cycles_and_wait_a_bit, kwargs={'duration': 5.0}) for _ in range(job_count)]
         )
     return render_template(
         'index.html',
         hit_count=get_hit_count(),
-        job=job,
+        job_count=job_count,
+        jobs=jobs,
         q_urgent=q_urgent,
         q_default=q_default,
         q_priority=q_priority
