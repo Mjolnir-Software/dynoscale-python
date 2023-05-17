@@ -8,5 +8,5 @@
 - install dependencies: `pip install -r requirements.txt`
 - make sure to `source venv/bin/activate` before each of the following commands
 - start `python3 -m worker` in yet another terminal
-- start `python3 -m app` in yet another but finally last terminal
+- start `python3 -m web` in yet another but finally last terminal
 - now you can `open http://127.0.0.1:3000`
