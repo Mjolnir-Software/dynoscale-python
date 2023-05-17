@@ -2,6 +2,7 @@ import logging
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Optional, Iterable, Generator
+from urllib.parse import urlparse, parse_qs, urlencode
 
 import redis
 from rq import Queue
@@ -11,6 +12,16 @@ from dynoscale.repository import DynoscaleRepository, Record
 from dynoscale.utils import epoch_s
 
 logger = logging.getLogger(__name__)
+
+
+def allow_self_signed_certificates(url_str: str) -> str:
+    url = urlparse(url_str)
+    if not url.scheme == 'rediss':
+        return url_str
+
+    query_dict = parse_qs(url.query)
+    query_dict['ssl_cert_reqs'] = ['none']
+    return url._replace(query=urlencode(query_dict, doseq=True)).geturl()
 
 
 def get_enqueued_at_of_oldest_job(queue: Queue) -> Optional[datetime]:
@@ -29,10 +40,10 @@ def queue_time_records_for_connection(connection) -> Iterable[Record]:
 
 
 @contextmanager
-def redis_connection(url: str) -> Generator[redis.Redis, None, None]:
+def redis_connection(url_str: str) -> Generator[redis.Redis, None, None]:
     conn = None
     try:
-        conn = redis.from_url(url)
+        conn = redis.from_url(allow_self_signed_certificates(url_str))
         yield conn
     finally:
         if conn:

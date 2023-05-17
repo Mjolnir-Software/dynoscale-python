@@ -12,6 +12,7 @@ from rq.exceptions import NoSuchJobError
 from rq.job import Job
 
 from dynoscale.config import get_redis_urls_from_environ
+from dynoscale.workers.rq_logger import allow_self_signed_certificates
 from dynoscale.wsgi import DynoscaleWsgiApp
 from worker import count_cycles_and_wait_a_bit
 
@@ -90,7 +91,7 @@ def init_redis_conn_and_queues(redis_url: Optional[str] = None):
     global q_urgent
     global q_priority
     global q_default
-    conn = redis.from_url(redis_url)
+    conn = redis.from_url(allow_self_signed_certificates(redis_url))
     q_urgent = Queue('urgent', connection=conn)
     q_priority = Queue('priority', connection=conn)
     q_default = Queue(connection=conn)
@@ -110,7 +111,7 @@ if __name__ == "__main__":
         "--redis_url_in",
         type=str,
         help="Env var with Redis Url for RQ, default: %(default)s",
-        default='REDIS_URL'
+        default='REDIS_TLS_URL'
     )
     args = parser.parse_args()
 

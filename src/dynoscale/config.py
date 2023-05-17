@@ -10,7 +10,13 @@ from dynoscale.utils import is_valid_url, ensure_module
 
 def get_redis_urls_from_environ() -> Dict[str, str]:
     """Returns a dictionary of possible redis urls from all known redis_url environment variables"""
-    redis_env_vars = (ENV_REDIS_URL, ENV_REDISTOGO_URL, ENV_OPENREDIS_URL, ENV_REDISGREEN_URL, ENV_REDISCLOUD_URL)
+    redis_env_vars = (
+        ENV_REDIS_TLS_URL, ENV_REDIS_URL,
+        ENV_REDISTOGO_TLS_URL, ENV_REDISTOGO_URL,
+        ENV_OPENREDIS_TLS_URL, ENV_OPENREDIS_URL,
+        ENV_REDISGREEN_TLS_URL, ENV_REDISGREEN_URL,
+        ENV_REDISCLOUD_TLS_URL, ENV_REDISCLOUD_URL
+    )
     return {name: os.environ[name] for name in redis_env_vars if name in os.environ}
 
 

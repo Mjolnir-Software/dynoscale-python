@@ -2,6 +2,7 @@
 
 ### 1.2.2 [TBD]
  - updated test/dev dependencies
+ - adding support for TLS redis urls with self-signed certificates
 
 ### 1.2.1 [2023-03-01]
  - Fix: Limit resource consumption while reporting on extreme numbers of pending tasks.

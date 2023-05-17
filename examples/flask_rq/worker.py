@@ -4,6 +4,8 @@ import time
 import redis
 from rq import Worker, Queue, Connection
 
+from dynoscale.workers.rq_logger import allow_self_signed_certificates
+
 if __name__ == '__main__':
     import argparse
 
@@ -18,11 +20,11 @@ if __name__ == '__main__':
         "--redis_url_in",
         type=str,
         help="Env var with Redis Url for RQ, default: %(default)s",
-        default='REDIS_URL'
+        default='REDIS_TLS_URL'
     )
     args = parser.parse_args()
 
-    redis_url = os.getenv(args.redis_url_in, args.redis_url)
+    redis_url = allow_self_signed_certificates(os.getenv(args.redis_url_in, args.redis_url))
     print(f"Starting RQ worker, will connect to redis @ {redis_url}")
     conn = redis.from_url(redis_url)
     with Connection(conn):
