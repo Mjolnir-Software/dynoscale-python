@@ -28,16 +28,24 @@
 <body>
 <nav>
     <a class="button" href="{{ url_for('index') }}">home</a>
-    <a class="button" href="{{ url_for('index') }}?queue_name=urgent">new urgent job</a>
-    <a class="button" href="{{ url_for('index') }}?queue_name=priority">new priority job</a>
-    <a class="button" href="{{ url_for('index') }}?queue_name=default">new default job</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=urgent">add urgent job</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=priority">add priority job</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=default">add default job</a>
 </nav>
 <br>
 <br>
 <nav>
-    <a class="button" href="{{ url_for('index') }}?queue_name=urgent&job_count=10000">10 000 new urgent jobs</a>
-    <a class="button" href="{{ url_for('index') }}?queue_name=priority&job_count=10000">10 000 new priority jobs</a>
-    <a class="button" href="{{ url_for('index') }}?queue_name=default&job_count=10000">10 000 new default jobs</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=urgent&job_count=100">+100 urgent jobs</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=priority&job_count=100">+100 new priority jobs</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=default&job_count=100">+100 new default jobs</a>
+</nav>
+<br>
+<hr>
+<br>
+<nav>
+    <a class="button" href="{{ url_for('index') }}?queue_name=urgent&job_count=1000">+1 000 urgent jobs</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=priority&job_count=1000">+1 000 priority jobs</a>
+    <a class="button" href="{{ url_for('index') }}?queue_name=default&job_count=1000">+1 000 default jobs</a>
 </nav>
 <div class="content">
     {% block content %} {% endblock %}
