@@ -1,7 +1,10 @@
-# Change Log of `dynoscale` for Python
+# Changelog of `dynoscale` for Python
 
-### 1.2.1 [TBD]
- - ...
+### 1.2.2 [TBD]
+ - updated test/dev dependencies
+
+### 1.2.1 [2023-03-01]
+ - Fix: Limit resource consumption while reporting on extreme numbers of pending tasks.
 
 ### 1.2.0 [2023-01-08]
  - dropping support for Python 3.7, 3.8, 3.9
