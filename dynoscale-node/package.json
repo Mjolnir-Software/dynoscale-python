@@ -1,0 +1,43 @@
+{
+  "name": "dynoscale-node",
+  "version": "1.0.0",
+  "description": "Scaling agent for Node.js apps on Heroku. Reports web and worker queue time to the Dynoscale add-on.",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "dynoscale",
+    "heroku",
+    "autoscaling",
+    "express",
+    "queue-time"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mjolnir-Software/dynoscale-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mjolnir-Software/dynoscale-node/issues"
+  },
+  "homepage": "https://dynoscale.net",
+  "peerDependencies": {
+    "bullmq": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "bullmq": {
+      "optional": true
+    }
+  }
+}
