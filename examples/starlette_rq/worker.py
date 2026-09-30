@@ -3,7 +3,7 @@ import os
 import time
 
 import redis
-from rq import Worker, Queue, Connection
+from rq import Queue, Worker
 
 from dynoscale.config import get_redis_urls_from_environ
 
@@ -32,8 +32,8 @@ if __name__ == '__main__':
 
     print(f"Starting RQ worker, will connect to redis @ {redis_url}")
     conn = redis.from_url(redis_url)
-    with Connection(conn):
-        Worker(list(map(Queue, ['urgent', 'priority', 'default']))).work()
+    queues = [Queue(name, connection=conn) for name in ("urgent", "priority", "default")]
+    Worker(queues, connection=conn).work()
 
 
 def count_cycles_and_wait_a_bit(duration: float) -> str:

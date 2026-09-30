@@ -1,7 +1,10 @@
 # Changelog of `dynoscale` for Python
 
 ### 1.2.2 [TBD]
- - updated test/dev dependencies
+ - updated runtime and test/dev dependencies
+ - dropped pytest-flake8; it does not load on current pytest (run flake8 directly)
+ - RQ queue times use timezone-aware UTC timestamps (RQ 2)
+ - DynoscaleUvicornWorker uses the uvicorn-worker package when it is installed
  - adding support for TLS redis urls with self-signed certificates
 
 ### 1.2.1 [2023-03-01]

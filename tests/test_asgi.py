@@ -79,9 +79,13 @@ def asgi_scope_http() -> Scope:
 def asgi_scope_websocket() -> Scope:
     return {
         'type': "websocket",
-        'headers': {
-            "HTTP_X_REQUEST_START": "1111111111"
-        }
+        'path': '/',
+        'headers': [
+            [b"HTTP_X_REQUEST_START", b"1111111111"],
+        ],
+        'query_string': b'',
+        'scheme': 'ws',
+        'root_path': '',
     }
 
 

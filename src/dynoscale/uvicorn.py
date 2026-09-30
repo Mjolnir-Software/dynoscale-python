@@ -1,7 +1,11 @@
 import logging
 from typing import Any
 
-from uvicorn.workers import UvicornWorker
+try:
+    from uvicorn_worker import UvicornWorker
+except ImportError:  # uvicorn.workers was split out; keep the old import for older installs
+    from uvicorn.workers import UvicornWorker
+
 from dynoscale.asgi import DynoscaleAsgiApp
 
 
