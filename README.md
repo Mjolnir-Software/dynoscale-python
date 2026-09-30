@@ -72,7 +72,7 @@ app = Flask(__name__)
 app.wsgi_app = DynoscaleWsgiApp(app.wsgi_app)
 ```
 
-Do you use Gunicorn with Uvicorn workers? Replace `uvicorn.workers.UvicornWorker`
+Do you use Gunicorn with Uvicorn workers? Install `uvicorn-worker` and replace `uvicorn.workers.UvicornWorker`
 with `dynoscale.DynoscaleUvicornWorker` like so:
 
 ```python
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     loglevel = 'debug'
     ```
 3. Install all the dependencies:
-   - `python -m pip install "uvicorn[standard]" gunicorn dynoscale`
+   - `python -m pip install "uvicorn[standard]" gunicorn uvicorn-worker dynoscale`
 4. Start it up with:
    ```bash
      DYNO=web.1 DYNOSCALE_DEV_MODE=true DYNOSCALE_URL=https://some_request_bin_or_some_such.com gunicorn

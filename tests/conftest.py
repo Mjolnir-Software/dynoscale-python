@@ -139,7 +139,7 @@ def env_del_dev_mode(monkeypatch):
 
 @pytest.fixture
 def env_set_data_dir_name(monkeypatch, repo_dir_name):
-    monkeypatch.setenv(ENV_DYNOSCALE_DATA_DIR_NAME, repo_dir_name)
+    monkeypatch.setenv(ENV_DYNOSCALE_DATA_DIR_NAME, str(repo_dir_name))
     yield
 
 
@@ -151,7 +151,7 @@ def env_del_data_dir_name(monkeypatch):
 
 @pytest.fixture
 def env_set_data_file_name(monkeypatch, repo_file_name):
-    monkeypatch.setenv(ENV_DYNOSCALE_DATA_FILE_NAME, repo_file_name)
+    monkeypatch.setenv(ENV_DYNOSCALE_DATA_FILE_NAME, str(repo_file_name))
     yield
 
 

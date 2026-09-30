@@ -1,6 +1,6 @@
 import logging
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Iterable, Generator
 from urllib.parse import urlparse, parse_qs, urlencode
 
@@ -30,11 +30,13 @@ def get_enqueued_at_of_oldest_job(queue: Queue) -> Optional[datetime]:
 
 
 def queue_time_records_for_connection(connection) -> Iterable[Record]:
-    utc_now = datetime.utcnow()
+    utc_now = datetime.now(timezone.utc)
     for queue in Queue.all(connection=connection):
         logger.debug(f"Dynoscale getting oldest RQ job for queue: {queue.name}")
         oldest_job_enqueued_at = get_enqueued_at_of_oldest_job(queue)
         if oldest_job_enqueued_at is not None:
+            if oldest_job_enqueued_at.tzinfo is None:
+                oldest_job_enqueued_at = oldest_job_enqueued_at.replace(tzinfo=timezone.utc)
             queue_time_ms = int((utc_now - oldest_job_enqueued_at).total_seconds() * 1_000)
             yield Record(timestamp=epoch_s(), metric=queue_time_ms, source=f"rq:{queue.name}", metadata="")
 
